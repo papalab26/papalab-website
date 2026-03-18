@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-en="Papa-Lab Games | papalab26.com">Papa-Lab 遊戲樂園 | papalab26.com</title>
+    <meta name="description" content="Papa-Lab 專屬網頁遊戲門戶，提供無廣告干擾的純淨遊戲體驗。首波主打：益智數學塔防遊戲。">
+    <style>
+        /* 基礎設定 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        a { text-decoration: none; color: inherit; }
+        
+        /* 頂部導航欄 (Header) */
+        header {
+            background-color: #2c3e50; 
+            color: white;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        /* Logo 區域設定 */
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            display: flex; 
+            align-items: center;
+        }
+        .logo span { color: #3498db; } 
+        
+        /* 導航選單設定 */
+        nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.5rem; }
+        nav ul li a { transition: color 0.3s; font-weight: 500; }
+        nav ul li a:hover { color: #3498db; } 
+
+        /* 主要內容區塊 */
+        main {
+            flex: 1;
+            padding: 3rem 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 90%;
+        }
+        .section-title { margin-top: 0; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 0.5rem; display: inline-block; margin-bottom: 2rem;}
+
+        /* 遊戲網格設計 (Game Grid) - 目前只有一款，會自動向左對齊 */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        /* 卡片設計 (Card View) */
+        .card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            max-width: 400px; /* 加上最大寬度，避免只有一款遊戲時卡片被拉得太寬 */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background-color: #e0e0e0;
+        }
+        .card-content { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
+        .card-title { margin: 0 0 0.5rem 0; font-size: 1.3rem; color: #2c3e50; }
+        .card-short-desc { font-weight: 600; color: #3498db; margin-bottom: 1rem; font-size: 0.9rem; } 
+        .card-seo-desc { font-size: 0.9rem; color: #666; line-height: 1.6; flex: 1; }
+        .play-btn {
+            display: block;
+            text-align: center;
+            background-color: #3498db;
+            color: white;
+            padding: 0.8rem;
+            border-radius: 5px;
+            margin-top: 1.5rem;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .play-btn:hover { background-color: #2980b9; }
+
+        /* 底部廣告區塊 (Bottom Ad Slot) */
+        .ad-container {
+            text-align: center;
+            padding: 2rem 0;
+            background-color: #e9ecef;
+            border-top: 1px solid #ddd;
+        }
+        .ad-placeholder {
+            display: inline-block;
+            width: 728px;
+            height: 90px;
+            background-color: #cfd8dc;
+            color: #546e7a;
+            line-height: 90px;
+            border: 2px dashed #90a4ae;
+            max-width: 90%; 
+        }
+
+        /* 頁尾 (Footer) */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 1.5rem 5%;
+            font-size: 0.9rem;
+        }
+        footer a { color: #bdc3c7; text-decoration: underline; margin: 0 10px; }
+        footer a:hover { color: white; }
+
+        /* 手機版排版微調 */
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 1rem; }
+            .logo { font-size: 1.3rem; } 
+            .card { max-width: 100%; } /* 手機版時讓卡片撐滿寬度 */
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            Papa-Lab <span>Games</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#" data-en="Home">首頁</a></li>
+                <li><a href="#" data-en="Puzzle & Math">益智數學</a></li>
+                <li><a href="#" data-en="Action & Casual">休閒動作</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2 class="section-title" data-en="Latest Games">最新遊戲</h2>
+        <div class="grid-container">
+            
+            <div class="card">
+                <img src="assets/GreenSoldier.png" alt="數學守衛戰封面" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%25%22 height=%22200%22%3E%3Crect width=%22100%25%22 height=%22100%25%22 fill=%22%23ddd%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 fill=%22%23888%22 font-family=%22sans-serif%22 font-size=%2216%22 text-anchor=%22middle%22 dy=%22.3em%22%3EMath Defender%3C/text%3E%3C/svg%3E'">
+                <div class="card-content">
+                    <h3 class="card-title" data-en="Math Defender">數學守衛戰</h3>
+                    <div class="card-short-desc" data-en="Puzzle Tower Defense / Stress-Free Learning">益智塔防 / 學習無壓力</div>
+                    <div class="card-seo-desc" data-en="A fun HTML5 tower defense game designed for first graders! Deploy your defenses using addition and subtraction. Featuring engaging sound effects and various challenge modes, kids can naturally improve their math skills while playing. A clean, ad-free experience focused on logic and calculation. Protect your base!">
+                        專為國小一年級設計的趣味 HTML5 塔防遊戲！透過加減法計算來部署防線，結合生動音效與多種挑戰模式，讓孩子在遊玩中自然提升數學能力。純粹單機的乾淨體驗，考驗你的邏輯與運算，保護主堡不被攻破！
+                    </div>
+                    <a href="/games/math-defense" class="play-btn" data-en="Play Now">開始遊玩</a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div class="ad-container">
+        <div class="ad-placeholder" data-en="Google AdSense Advertisement (728x90)">Google AdSense 廣告版位 (728x90)</div>
+    </div>
+
+    <footer>
+        <p data-en="Copyright &copy; 2026 Papa-Lab. All rights reserved.">Copyright &copy; 2026 Papa-Lab. All rights reserved.</p>
+        <p>
+            <a href="privacy.html" data-en="Privacy Policy">隱私權政策 (Privacy Policy)</a> | 
+            <a href="mailto:contact@papalab26.com" data-en="Contact Us">聯絡我們</a>
+        </p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const userLang = navigator.language || navigator.userLanguage;
+            const isChinese = userLang.toLowerCase().includes('zh');
+
+            if (!isChinese) {
+                document.documentElement.lang = "en";
+                
+                const elements = document.querySelectorAll('[data-en]');
+                elements.forEach(el => {
+                    el.textContent = el.getAttribute('data-en');
+                });
+                
+                const titleTag = document.querySelector('title');
+                if (titleTag && titleTag.hasAttribute('data-en')) {
+                    titleTag.textContent = titleTag.getAttribute('data-en');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

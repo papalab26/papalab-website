@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#edf6ed">
+<meta name="description" content="答對乘法，召喚小兵，保護城堡！選擇 1 到 9 的乘法，挑戰五個可愛的守城關卡。">
+<title>乘法小兵守城 | Papa-Lab</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header class="appbar">
+    <a class="brand" href="../../../" aria-label="返回 Papa-Lab 首頁">PAPA<span>LAB</span><small>小小冒險，大大成長</small></a>
+    <button class="sound button-icon" aria-label="關閉音樂與音效" aria-pressed="true">♫ 音樂開</button>
+  </header>
+  <main id="menu" class="menu">
+    <section class="welcome">
+      <div class="eyebrow">數學小隊 · 今天也要勇敢出發</div>
+      <h1>乘法小兵<span>守城</span></h1>
+      <p class="intro">答對乘法，召喚小兵，保護城堡！</p>
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 650 260"><defs><linearGradient id="heroSky" x2="0" y2="1"><stop stop-color="#c9ebf5"/><stop offset="1" stop-color="#f1f8dd"/></linearGradient></defs><rect x="0" y="0" width="650" height="260" rx="30" fill="url(#heroSky)"/><circle cx="527" cy="49" r="25" fill="#ffda7a"/><g fill="#fff" opacity=".85"><ellipse cx="107" cy="54" rx="50" ry="15"/><circle cx="95" cy="45" r="20"/><circle cx="118" cy="36" r="25"/><ellipse cx="408" cy="65" rx="48" ry="14"/><circle cx="394" cy="54" r="20"/><circle cx="418" cy="48" r="23"/></g><path d="M0 184Q100 94 222 183Q350 100 455 170Q570 96 650 164V260H0" fill="#b2d7ad"/><path d="M0 205Q120 165 250 212Q420 167 650 208V260H0" fill="#8fbd8d"/><path d="M252 260L300 165H354L402 260" fill="#ecd9ac"/><g stroke="#679cb2" stroke-width="4" stroke-linejoin="round"><path d="M260 216V115H390V216" fill="#d8edf0"/><path d="M253 118V87H277V100H299V87H321V100H343V87H365V100H396V118Z" fill="#a9d3df"/><path d="M238 220V148H276V220M374 220V148H412V220" fill="#bfdee6"/><path d="M232 149L257 122L282 149ZM368 149L393 122L418 149Z" fill="#74adca"/><path d="M306 220V186Q325 161 344 186V220" fill="#89aab8"/><path d="M289 148V131M361 148V131" stroke="#f1c36a" stroke-width="10"/></g><path d="M325 86V43" stroke="#7699ab" stroke-width="4"/><path d="M327 43L371 53L327 65Z" fill="#efb967"/><g transform="translate(166 176)"><ellipse cx="0" cy="53" rx="23" ry="6" fill="#456b6226"/><path d="M-10 29V48M10 29V48" stroke="#56798b" stroke-width="13" stroke-linecap="round"/><rect x="-18" y="6" width="36" height="29" rx="10" fill="#68a7ce"/><circle cy="-4" r="23" fill="#f8d6b0"/><path d="M-26-9Q-23-39 0-36Q23-39 26-9Z" fill="#6eabd0"/><rect x="-27" y="-11" width="54" height="9" rx="4" fill="#4b88b3"/><circle cx="-7" cy="0" r="2.5" fill="#47616f"/><circle cx="8" cy="0" r="2.5" fill="#47616f"/><path d="M-5 8Q0 13 5 8" fill="none" stroke="#ad826c" stroke-width="2"/><circle cx="-15" cy="6" r="4" fill="#eeb29d"/><circle cx="15" cy="6" r="4" fill="#eeb29d"/><path d="M19 18L32 11" stroke="#e0c08e" stroke-width="7" stroke-linecap="round"/></g><g transform="translate(465 196) scale(.76)"><path d="M-10 29V48M10 29V48" stroke="#5d8296" stroke-width="13" stroke-linecap="round"/><rect x="-18" y="6" width="36" height="29" rx="10" fill="#78b4d8"/><circle cy="-4" r="23" fill="#f8d6b0"/><path d="M-26-9Q-23-39 0-36Q23-39 26-9Z" fill="#6eabd0"/><rect x="-27" y="-11" width="54" height="9" rx="4" fill="#4b88b3"/><circle cx="-7" cy="0" r="2.5" fill="#47616f"/><circle cx="8" cy="0" r="2.5" fill="#47616f"/></g><g fill="#fff2c6"><circle cx="72" cy="232" r="4"/><circle cx="573" cy="223" r="4"/><circle cx="605" cy="239" r="4"/></g></svg>
+        <div class="hero-badge">3 × 7 = <strong>21</strong><span>21 名小兵，出發！</span></div>
+      </div>
+      <div class="howto"><span><b>01</b> 選乘法</span><span><b>02</b> 答題召喚</span><span><b>03</b> 守住五關</span></div>
+    </section>
+    <section class="selection paper">
+      <div class="section-title"><div><div class="eyebrow">準備好你的小隊</div><h2>選擇想練習的乘法</h2></div><button id="select-all" class="text-button">全選</button></div>
+      <p class="muted">可以選好幾個，從熟悉的開始也很棒。</p>
+      <div id="tables" class="tables" aria-label="乘法範圍"></div>
+      <p id="selection-note" class="selection-note" aria-live="polite">預設練習 2、3、4、5 的乘法</p>
+      <button id="start" class="primary start-button">開始遊戲 <span>→</span></button>
+      <p class="menu-tip">答對幾，就召喚幾名小兵 · 不限作答時間</p>
+      <p class="menu-tip">電腦也可以按 <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> 選答案</p>
+    </section>
+  </main>
+  <main id="game" class="game" hidden>
+    <div class="hud paper">
+      <div class="level-heading"><span class="level-icon">⚑</span><div><span id="level-kicker" class="eyebrow"></span><h2 id="level-name"></h2></div></div>
+      <div class="health" title="城堡生命"><span><span class="health-label">生命</span> <b id="hp">10 / 10</b></span><div class="health-track"><div id="health-fill"></div></div></div>
+      <div class="wave"><span>敵軍批次</span><b id="wave-count">0 / 6</b></div>
+      <button class="sound compact-sound button-icon" aria-label="關閉音樂與音效" aria-pressed="true">♫</button>
+      <button id="pause" class="button-icon" aria-label="暫停遊戲">Ⅱ <span>暫停</span></button>
+    </div>
+    <div class="play-layout">
+      <section class="field-panel paper" aria-label="守城戰場">
+        <div class="field-labels"><span class="ally-label">● 我方 <b id="ally-count">0</b></span><span id="wave-info"></span><span class="enemy-label">◆ 敵軍 <b id="enemy-count">0</b></span></div>
+        <div class="canvas-wrap"><canvas id="battle" width="700" height="700" aria-label="敵軍從上方進攻，藍色小兵從城堡出發迎戰"></canvas><div id="countdown" class="countdown" hidden><span>準備出發</span><strong id="countdown-number">3</strong><p>答對乘法，就有小兵來幫忙！</p></div><div id="formation" class="formation" hidden></div></div>
+        <div class="field-footer"><span>⌂ 保護下方城堡</span><span id="battle-note">敵軍將在第 5 秒出發</span></div>
+      </section>
+      <section class="question-panel paper">
+        <div class="question-heading"><span class="eyebrow">乘法補給站</span><span id="practice-tables"></span></div>
+        <h2 id="question" class="question">3 × 7 = ?</h2>
+        <p id="feedback" class="feedback" role="status" aria-live="polite">想一想，你的小兵正在等你！</p>
+        <div id="answers" class="answers"></div>
+        <button id="hint" class="text-button hint-button" hidden>✦ 看提示</button>
+        <div class="question-footer"><span>✓ 答對 <b id="correct-count">0</b> 題</span><span>⚑ 召喚 <b id="summon-count">0</b> 人</span></div>
+        <div class="encouragement"><span>✧</span><p>慢慢想，也能很厲害。<br>每一位小兵都是你的努力！</p></div>
+      </section>
+    </div>
+  </main>
+  <footer class="site-footer">Papa-Lab · 把練習變成小小冒險</footer>
+</div>
+<div id="dialog" class="dialog-backdrop" hidden>
+  <section class="dialog paper" role="dialog" aria-modal="true" aria-labelledby="dialog-title" tabindex="-1">
+    <div id="dialog-art" class="dialog-art" aria-hidden="true"></div>
+    <div id="dialog-kicker" class="eyebrow"></div>
+    <h2 id="dialog-title"></h2><p id="dialog-message"></p>
+    <div id="dialog-content"></div><div id="dialog-actions" class="dialog-actions"></div>
+  </section>
+</div>
+<script type="module" src="js/game.mjs"></script>
+</body>
+</html>

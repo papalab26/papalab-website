@@ -183,6 +183,19 @@ body { background:radial-gradient(ellipse at top,#fff8df 0%,#e5f4ee 65%,#d4ece8 
 .pause-title { color:#315c70; }.pbtn-resume { background:#60a9bc; }.pbtn-quit { background:#eff4ed; border:1px solid #cfdfd0; color:#4e6d59; }
 #restBtn { background:#ffcf76; color:#735222; box-shadow:0 4px 0 #e8b35d; }
 @media(max-width:980px) { #gc { border-radius:0; border-width:0; }#bpRow { height:auto; }#hud { padding:8px; }.diff-title { font-size:30px; } }
+
+#levelTag { color:#436b79; font-size:13px; font-weight:700; }
+.level-roadmap { color:#71887c; background:#eef5e9; padding:12px; border-radius:12px; font-size:13px; margin:-12px 0 20px; line-height:1.8; }
+.result-menu { display:block; margin:16px auto 0; border:1px solid #d1dfcf; border-radius:12px; background:#edf5e7; color:#5c7b64; padding:10px 22px; min-height:44px; font:inherit; cursor:pointer; }
+@media(max-width:600px) { #levelTag { flex-basis:100%; text-align:center; font-size:12px; }.level-roadmap { font-size:11px; } }
+
+
+.ub[hidden] { display:none!important; }
+.ub.ub-poor { filter:grayscale(1);opacity:.45;background:#e9ece6;border-color:#bdc5bc;color:#7b857e;box-shadow:none; }
+.ub.ub-poor .uc { color:#7b857e; }
+#ubtns[data-visible="1"] { grid-template-columns:1fr;grid-template-rows:1fr; }
+#ubtns[data-visible="2"] { grid-template-columns:repeat(2,1fr);grid-template-rows:1fr; }
+#ubtns[data-visible="3"] #bA { grid-column:1 / -1; }
 </style>
 </head>
 <body>
@@ -207,7 +220,7 @@ body { background:radial-gradient(ellipse at top,#fff8df 0%,#e5f4ee 65%,#d4ece8 
       </div>
     </div>
     <div id="hudRow2">
-      <span id="diffTag">—</span>
+      <span id="levelTag">第 1 關 · 士兵初戰</span><span id="diffTag">—</span>
       <button class="ctrl-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
       <button class="ctrl-btn" id="fsBtn" onclick="toggleFS()">⛶ 全螢幕</button>
       <button class="ctrl-btn" id="pauseBtn" onclick="togglePause()">⏸ 暫停</button>
@@ -242,11 +255,12 @@ body { background:radial-gradient(ellipse at top,#fff8df 0%,#e5f4ee 65%,#d4ece8 
 </div></div>
 
 <!-- 遊戲結束 -->
-<div id="ov"><div id="ovbox"><div id="ovtitle"></div><div id="ovmsg"></div><button id="restBtn" onclick="showDiff()">🔄 再玩一次</button></div></div>
+<div id="ov"><div id="ovbox"><div id="ovtitle"></div><div id="ovmsg"></div><button id="restBtn" onclick="resultAction()">下一關 →</button><button class="result-menu" onclick="showDiff()">回主選單</button></div></div>
 <!-- 難度選擇 -->
 <div id="diffOv"><div id="diffBox">
   <div class="diff-title">⚔ 鬥塔大戰 ⚔</div>
-  <div class="diff-sub">請選擇數學難度，開始征戰！</div>
+  <div class="diff-sub">四關守城冒險 · 第一關 5 以內加法，輕鬆入門<br>第二關起使用你選擇的數學難度</div>
+  <div class="level-roadmap">① 士兵 → ② 坦克 → ③ 飛機 → ④ 機器人</div>
   <div id="diffBtns">
     <button class="dBtn dBtn-e" onclick="startGame('easy')"><span class="dIco">🔢</span><span class="dLv">簡單模式</span><span class="dName">10 以內加法</span><span class="dRange dRange-e">1 ~ 10</span><span class="dDesc">兩個數字相加<br>答案保證在 1 到 10 之間</span></button>
     <button class="dBtn dBtn-h" onclick="startGame('hard')"><span class="dIco">🧮</span><span class="dLv">困難模式</span><span class="dName">20 以內加法</span><span class="dRange dRange-h">11 ~ 20</span><span class="dDesc">兩個數字相加<br>答案保證在 11 到 20 之間</span></button>
@@ -258,7 +272,7 @@ body { background:radial-gradient(ellipse at top,#fff8df 0%,#e5f4ee 65%,#d4ece8 
     <div class="pause-title">⏸ 遊戲暫停</div>
     <div class="pause-btns">
       <button class="pbtn pbtn-resume" onclick="resumeGame()">▶ 繼續遊戲</button>
-      <button class="pbtn pbtn-quit" onclick="quitToMenu()">🏠 返回選關</button>
+      <button class="pbtn pbtn-quit" onclick="quitToMenu()">🏠 回主選單</button>
     </div>
   </div>
 </div>
@@ -329,16 +343,15 @@ function quitToMenu(){
 // ═══════════════════════════════════════════════════════════
 //  AUDIO ENGINE
 // ═══════════════════════════════════════════════════════════
-let AC=null,bgGain=null,muted=false,bgRunning=false,bgTid=null;
+let AC=null,bgGain=null,muted=false,bgRunning=false;
+let bgIndex=0,bgNextAt=0,bgNextBeatAt=0,bgTickBuffer=null;
+const bgSources=new Set();
 const sfxLast={};
-function getAC(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC;}
-function getBgGain(){const a=getAC();if(!bgGain){bgGain=a.createGain();bgGain.gain.value=muted?0:1;bgGain.connect(a.destination);}return bgGain;}
+function getAC(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume().catch(()=>{});return AC;}
 function toggleMute(){
   muted=!muted;
   document.getElementById('muteBtn').textContent=muted?'🔇':'🔊';
-  try{getBgGain().gain.setValueAtTime(muted?0:1,getAC().currentTime);}catch(e){}
-  if(muted){bgRunning=false;if(bgTid)clearTimeout(bgTid);}
-  else if(running&&!paused)startBgMusic();
+  if(muted)stopBgMusic();else if(running&&!paused)startBgMusic();
 }
 function sfx(type,ms=80){
   if(muted)return;
@@ -393,33 +406,50 @@ const BG_MELODY=[
   [523,.25],[659,.25],[784,.25],[659,.25],[523,.25],[440,.25],[698,.25],[440,.25],
   [392,.25],[494,.25],[587,.25],[494,.25],[523,.75],[0,.25],
 ];
-function startBgMusic(){if(bgRunning||muted)return;bgRunning=true;_bgLoop();}
-function stopBgMusic(){bgRunning=false;if(bgTid)clearTimeout(bgTid);try{getBgGain().gain.setValueAtTime(0,getAC().currentTime);}catch(e){}}
-function _bgLoop(){
-  if(!bgRunning||muted)return;
+function trackBgSource(source,nodes=[]){
+  const voice={source,nodes};bgSources.add(voice);
+  source.onended=()=>{bgSources.delete(voice);for(const node of [source,...nodes]){try{node.disconnect();}catch(e){}}};
+  return source;
+}
+function startBgMusic(){
+  if(bgRunning||muted||!running||paused)return;
   try{
-    const a=getAC(),bg=getBgGain();bg.gain.setValueAtTime(1,a.currentTime);
-    const t=a.currentTime+.06;let total=0;
-    BG_MELODY.forEach(([fr,dur])=>{
+    const a=getAC();bgGain=a.createGain();bgGain.gain.value=1;bgGain.connect(a.destination);
+    bgRunning=true;bgIndex=0;bgNextAt=a.currentTime+.04;bgNextBeatAt=bgNextAt;_bgLoop();
+  }catch(e){stopBgMusic();}
+}
+function stopBgMusic(){
+  bgRunning=false;
+  // Disconnect this session before clearing nodes, so restarting cannot revive old notes.
+  if(bgGain){try{bgGain.gain.cancelScheduledValues(AC.currentTime);bgGain.gain.value=0;bgGain.gain.setValueAtTime(0,AC.currentTime);bgGain.disconnect();}catch(e){}bgGain=null;}
+  for(const {source,nodes} of bgSources){try{source.stop(AC.currentTime);}catch(e){}for(const node of [source,...nodes]){try{node.disconnect();}catch(e){}}}
+  bgSources.clear();
+}
+function _bgLoop(){
+  if(!bgRunning||muted||paused||!running)return;
+  try{
+    const a=AC,bg=bgGain;if(!a||a.state!=='running'||!bg)return;
+    const horizon=a.currentTime+.16;
+    if(bgNextAt<a.currentTime)bgNextAt=a.currentTime+.025;
+    while(bgNextAt<horizon){
+      const [fr,dur]=BG_MELODY[bgIndex],at=bgNextAt;
       if(fr>0){
-        const mo=a.createOscillator(),mg=a.createGain();mo.type='triangle';mo.frequency.value=fr;
-        const vib=a.createOscillator(),vibg=a.createGain();vib.type='sine';vib.frequency.value=5.5;vibg.gain.value=3;vib.connect(vibg);vibg.connect(mo.frequency);
-        mo.connect(mg);mg.connect(bg);
-        mg.gain.setValueAtTime(0,t+total);mg.gain.linearRampToValueAtTime(.065,t+total+.015);mg.gain.exponentialRampToValueAtTime(.025,t+total+dur*.6);mg.gain.exponentialRampToValueAtTime(.001,t+total+dur*.95);
-        mo.start(t+total);mo.stop(t+total+dur+.04);vib.start(t+total);vib.stop(t+total+dur+.04);
+        const mo=a.createOscillator(),mg=a.createGain(),vib=a.createOscillator(),vibg=a.createGain();
+        trackBgSource(mo,[mg]);trackBgSource(vib,[vibg]);
+        mo.type='triangle';mo.frequency.value=fr;vib.type='sine';vib.frequency.value=5.5;vibg.gain.value=3;vib.connect(vibg);vibg.connect(mo.frequency);
+        mo.connect(mg);mg.connect(bg);mg.gain.setValueAtTime(0,at);mg.gain.linearRampToValueAtTime(.065,at+.015);mg.gain.exponentialRampToValueAtTime(.025,at+dur*.6);mg.gain.exponentialRampToValueAtTime(.001,at+dur*.95);
+        mo.start(at);mo.stop(at+dur+.04);vib.start(at);vib.stop(at+dur+.04);
+        if(bgIndex%4===0){const bass=a.createOscillator(),gain=a.createGain();trackBgSource(bass,[gain]);bass.type='sine';bass.frequency.value=fr*.5;bass.connect(gain);gain.connect(bg);gain.gain.setValueAtTime(0,at);gain.gain.linearRampToValueAtTime(.09,at+.02);gain.gain.exponentialRampToValueAtTime(.001,at+.75);bass.start(at);bass.stop(at+.85);}
       }
-      total+=dur;
-    });
-    let bt=0;
-    BG_MELODY.forEach(([fr,dur],i)=>{
-      if(i%4===0&&fr>0){const bo=a.createOscillator(),bg2=a.createGain();bo.type='sine';bo.frequency.value=fr*.5;bo.connect(bg2);bg2.connect(bg);bg2.gain.setValueAtTime(0,t+bt);bg2.gain.linearRampToValueAtTime(.09,t+bt+.02);bg2.gain.exponentialRampToValueAtTime(.001,t+bt+.75);bo.start(t+bt);bo.stop(t+bt+.85);}
-      bt+=dur;
-    });
-    const totalDur=BG_MELODY.reduce((s,[,d])=>s+d,0);
-    const tickBuf=a.createBuffer(1,a.sampleRate*.035|0,a.sampleRate);const td=tickBuf.getChannelData(0);for(let k=0;k<td.length;k++)td[k]=Math.random()*2-1;
-    for(let beat=0;beat<Math.floor(totalDur/.5);beat++){const tk=a.createBufferSource(),tkf=a.createBiquadFilter(),tkg=a.createGain();tk.buffer=tickBuf;tkf.type='highpass';tkf.frequency.value=7000;tkg.gain.setValueAtTime(.04,t+beat*.5);tkg.gain.exponentialRampToValueAtTime(.001,t+beat*.5+.03);tk.connect(tkf);tkf.connect(tkg);tkg.connect(bg);tk.start(t+beat*.5);tk.stop(t+beat*.5+.04);}
-    bgTid=setTimeout(_bgLoop,(totalDur-.18)*1000);
-  }catch(e){}
+      bgNextAt+=dur;bgIndex=(bgIndex+1)%BG_MELODY.length;
+    }
+    if(!bgTickBuffer){bgTickBuffer=a.createBuffer(1,a.sampleRate*.035|0,a.sampleRate);const data=bgTickBuffer.getChannelData(0);for(let k=0;k<data.length;k++)data[k]=Math.random()*2-1;}
+    if(bgNextBeatAt<a.currentTime)bgNextBeatAt=a.currentTime+.025;
+    while(bgNextBeatAt<horizon){
+      const tick=a.createBufferSource(),filter=a.createBiquadFilter(),gain=a.createGain(),at=bgNextBeatAt;
+      trackBgSource(tick,[filter,gain]);tick.buffer=bgTickBuffer;filter.type='highpass';filter.frequency.value=7000;gain.gain.setValueAtTime(.04,at);gain.gain.exponentialRampToValueAtTime(.001,at+.03);tick.connect(filter);filter.connect(gain);gain.connect(bg);tick.start(at);tick.stop(at+.04);bgNextBeatAt+=.5;
+    }
+  }catch(e){stopBgMusic();}
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -439,7 +469,16 @@ const UDEFS={
 //  STATE
 // ═══════════════════════════════════════════════════════════
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
-const UNLOCK={soldier:0,tank:5,airplane:10,robot:15}; // 答對N題解鎖
+const LEVELS=[
+  {name:'士兵初戰',castleHP:200,enemyHP:60,startPoints:3,answerPoints:1},
+  {name:'坦克增援',castleHP:400,startPoints:6,answerPoints:1},
+  {name:'空中支援',castleHP:700,startPoints:9,answerPoints:1},
+  {name:'機器人決戰',castleHP:1000,startPoints:12,answerPoints:1},
+];
+const UNLOCK={soldier:1,tank:2,airplane:3,robot:4};
+let currentLevel=0,resultMode=null;
+function levelCastleHP(side='player'){return side==='cpu'?(LEVELS[currentLevel].enemyHP||LEVELS[currentLevel].castleHP):LEVELS[currentLevel].castleHP;}
+function cpuSpendDelay(){return currentLevel===0?ri(840,1080):ri(180,300);}
 // ── 精靈圖預載 ──────────────────────────────────────────────
 // No sprite was supplied; use the built-in Canvas soldier artwork.
 const soldierImg=new Image();
@@ -447,7 +486,9 @@ let pHP=MAX_HP,cHP=MAX_HP,pPts=0,cPts=10;
 let correctCount=0,cpuTotalCoins=0; // 解鎖進度追蹤
 let units=[],projs=[],efx=[],fwp=[],debrisArr=[];
 let uid=0,running=false;
-let cpuCoinTimer=0,cpuCoinInterval=300,cpuSpendTimer=0,cpuSpendInterval=360,cpuSpawnCount=0;
+let cpuSpendTimer=0,cpuSpendInterval=360,cpuSpawnCount=0;
+let cpuQuestion=null,cpuQuestionBag=[],cpuPreviousKey=null,cpuSolveLeft=0,cpuAnswerCount=0,cpuLastSolved=null;
+let cpuPlanQueue=[],cpuPurchaseHistory=[];
 let prepPhase=false,prepFrames=0,gameFrames=0;
 let curQ={ans:4,choices:[3,4,5,6],locked:false},difficulty='easy';
 
@@ -479,62 +520,93 @@ function startVictoryFW(){
 // ═══════════════════════════════════════════════════════════
 //  DIFFICULTY / INIT
 // ═══════════════════════════════════════════════════════════
-function showDiff(){clearRoundTimers();document.getElementById('ov').style.display='none';document.getElementById('diffOv').style.display='flex';stopBgMusic();fwp=[];}
-function startGame(diff){
-  difficulty=diff;
+function showDiff(){
+  clearRoundTimers();stopBgMusic();running=false;paused=false;prepPhase=false;
+  cpuQuestion=null;cpuQuestionBag=[];cpuSolveLeft=0;cpuPlanQueue=[];cpuPurchaseHistory=[];cpuAnswerCount=0;
+  currentLevel=0;resultMode=null;units=[];projs=[];efx=[];fwp=[];debrisArr=[];
+  pHP=levelCastleHP();cHP=levelCastleHP('cpu');pPts=LEVELS[0].startPoints||3;correctCount=0;
+  document.getElementById('ov').style.display='none';
+  document.getElementById('pauseOv').style.display='none';
+  document.getElementById('diffOv').style.display='flex';redraw();
+}
+function startGame(diff){difficulty=diff;startLevel(0);}
+function startLevel(index){
+  if(index<0||index>=LEVELS.length)return;
+  currentLevel=index;resultMode=null;stopBgMusic();
   document.getElementById('diffOv').style.display='none';
-  document.getElementById('diffTag').textContent=diff==='easy'?'10以內加法':'20以內加法';
-  init();startBgMusic();
+  document.getElementById('ov').style.display='none';
+  init();startBgMusic();scaleGame();
+}
+function resultAction(){
+  if(resultMode==='won')startLevel(currentLevel<LEVELS.length-1?currentLevel+1:0);
+  else if(resultMode==='lost')startLevel(currentLevel);
 }
 function init(){
   clearRoundTimers();
   document.getElementById('pauseOv').style.display='none';
-  pHP=MAX_HP;cHP=MAX_HP;pPts=3;cPts=10;
-  correctCount=0;cpuTotalCoins=10; // 起始10枚金幣算進解鎖進度
+  pHP=levelCastleHP();cHP=levelCastleHP('cpu');pPts=LEVELS[currentLevel].startPoints||3;cPts=LEVELS[currentLevel].startPoints||3;
+  correctCount=0;cpuTotalCoins=cPts; // CPU 每次答對賺一點，起始點數與玩家相同
   units=[];projs=[];efx=[];fwp=[];debrisArr=[];
   uid=0;running=true;paused=false;
-  cpuCoinTimer=0;cpuCoinInterval=ri(180,600);
-  cpuSpendTimer=0;cpuSpendInterval=ri(240,480);cpuSpawnCount=0;
+  cpuQuestionBag=[];cpuPreviousKey=null;cpuQuestion=null;cpuSolveLeft=0;cpuAnswerCount=0;cpuLastSolved=null;cpuPlanQueue=[];cpuPurchaseHistory=[];nextCpuQuestion();
+  cpuSpendTimer=0;cpuSpendInterval=cpuSpendDelay();cpuSpawnCount=0;
   prepPhase=true;prepFrames=0;gameFrames=0;
   document.getElementById('pauseBtn').textContent='⏸ 暫停';
-  newQ();redraw();
+  questionBag=[];recentQuestionKeys=[];newQ();redraw();
 }
 
 // ═══════════════════════════════════════════════════════════
 //  MATH
 // ═══════════════════════════════════════════════════════════
+let questionBag=[],recentQuestionKeys=[];
+function questionBank(){
+  const minimum=currentLevel===0?2:difficulty==='easy'?2:11;
+  const maximum=currentLevel===0?5:difficulty==='easy'?10:20;
+  const bank=[];for(let sum=minimum;sum<=maximum;sum++)for(let a=1;a<sum;a++)bank.push({a,b:sum-a,sum,key:[a,sum-a].sort((x,y)=>x-y).join('+')});
+  return bank;
+}
 function newQ(){
-  const sum=difficulty==='easy'?ri(2,10):ri(11,20);
-  const a=ri(1,sum-1),b=sum-a;
+  const bank=questionBank();
+  if(!questionBag.length){questionBag=[...bank];shuffle(questionBag);}
+  let index=questionBag.findIndex(q=>!recentQuestionKeys.includes(q.key));
+  if(index<0)index=questionBag.findIndex(q=>q.key!==recentQuestionKeys.at(-1));
+  let q;
+  if(index>=0)q=questionBag.splice(index,1)[0];
+  else {const alternatives=bank.filter(q=>q.key!==recentQuestionKeys.at(-1));q=alternatives[ri(0,alternatives.length-1)];}
+  recentQuestionKeys.push(q.key);if(recentQuestionKeys.length>3)recentQuestionKeys.shift();
+  const {a,b,sum}=q;
   const choices=makeChoices(sum);
-  curQ={ans:sum,choices,locked:false};
+  curQ={a,b,key:q.key,ans:sum,choices,locked:false};
   document.getElementById('qtext').textContent=`${a} + ${b} = ?`;
   document.getElementById('fb').textContent='';document.getElementById('fb').className='';
   [0,1,2,3].forEach(i=>{const btn=document.getElementById('c'+i);btn.textContent=choices[i];btn.disabled=false;btn.className='cBtn';});
 }
 function makeChoices(ans){
+  const max=currentLevel===0?5:difficulty==='easy'?10:20;
+  const min=currentLevel===0||difficulty==='easy'?1:11;
   const used=new Set([ans]);
-  const offs=[1,2,3,4,-1,-2,-3,-4];shuffle(offs);
-  for(const off of offs){if(used.size>=4)break;const w=ans+off;if(w>=1)used.add(w);}
-  for(let w=1;used.size<4;w++)used.add(w);
-  const all=[...used].slice(0,4);shuffle(all);return all;
+  const offsets=[1,2,3,4,-1,-2,-3,-4];shuffle(offsets);
+  for(const offset of offsets){const wrong=ans+offset;if(wrong>=min&&wrong<=max)used.add(wrong);if(used.size===4)break;}
+  if(used.size<4){const remaining=Array.from({length:max-min+1},(_,i)=>i+min).filter(n=>!used.has(n));shuffle(remaining);for(const n of remaining){used.add(n);if(used.size===4)break;}}
+  const all=[...used];shuffle(all);return all;
 }
 function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}}
 function choose(idx){
-  if(!running||paused||curQ.locked)return;
+  if(!running||paused||curQ.locked||document.getElementById('c'+idx).disabled)return;
   curQ.locked=true;
   const btns=[0,1,2,3].map(i=>document.getElementById('c'+i));
   btns.forEach(b=>b.disabled=true);
   const fb=document.getElementById('fb'),ci=curQ.choices.indexOf(curQ.ans);
-  if(curQ.choices[idx]===curQ.ans){pPts+=1;correctCount++;btns[idx].classList.add('c-ok');fb.textContent='✓ 正確！+1 點';fb.className='fb-ok';sfx('ok',0);redraw();questionDelay=480;}
+  if(curQ.choices[idx]===curQ.ans){const reward=LEVELS[currentLevel].answerPoints||1;pPts+=reward;correctCount++;btns[idx].classList.add('c-ok');fb.textContent=`✓ 正確！+${reward} 點`;fb.className='fb-ok';sfx('ok',0);redraw();questionDelay=480;}
+  else if(currentLevel===0){curQ.locked=false;btns.forEach((button,i)=>button.disabled=i===idx||button.classList.contains('c-no'));btns[idx].classList.add('c-no');fb.textContent='再想一想，你可以的！';fb.className='fb-no';sfx('no',0);}
   else{btns[idx].classList.add('c-no');btns[ci].classList.add('c-ok');fb.textContent=`✗ 答案是 ${curQ.ans}`;fb.className='fb-no';sfx('no',0);questionDelay=1000;}
 }
 
 // ═══════════════════════════════════════════════════════════
 //  UNIT MANAGEMENT
 // ═══════════════════════════════════════════════════════════
-function playerUnlocked(type){return correctCount>=UNLOCK[type];}
-function cpuUnlocked(type){return cpuTotalCoins>=UNLOCK[type];}
+function playerUnlocked(type){return currentLevel+1>=UNLOCK[type];}
+function cpuUnlocked(type){return currentLevel+1>=UNLOCK[type];}
 function buy(type){
   if(!running||prepPhase||paused)return;
   if(!playerUnlocked(type))return;
@@ -542,10 +614,11 @@ function buy(type){
   pPts-=d.cost;spawn(type,'player');redraw();
 }
 function spawn(type,side){
+  if(!(side==='player'?playerUnlocked(type):cpuUnlocked(type)))return;
   const d=UDEFS[type],isP=side==='player';
   const x=isP?P_SPAWN:C_SPAWN,y=d.fly?(GY-d.fh-d.sz):(GY-d.sz);
   units.push({id:uid++,type,side,x,y,hp:d.hp,mhp:d.hp,spd:isP?d.spd:-d.spd,range:d.range,cd:d.cd,timer:0,dmg:d.dmg,ps:isP?d.ps:-d.ps,pt:d.pt,sz:d.sz,fly:d.fly,
-    state:'walk',animFrame:0,animTick:0,foy:d.foy??0.5});
+    state:'walk',animFrame:0,animTick:0,artTick:0,fireAnim:0,foy:d.foy??0.5});
 }
 function nearest(u){
   const canHitAir=(u.type==='airplane'||u.type==='robot');
@@ -563,38 +636,46 @@ function nearest(u){
 // ═══════════════════════════════════════════════════════════
 //  CPU AI ── 累積金幣後隨機出兵（與玩家同樣機制，但自動）
 // ═══════════════════════════════════════════════════════════
-function cpuAI(){
-  const r=Math.random();
-  const t=gameFrames; // 遊戲已進行幀數（60fps）
-
-  // ① 第一次出兵：一定是士兵
+function cpuSolveSeconds(q){
+  const base=q.sum<=5&&Math.max(q.a,q.b)<=3?3:q.sum<=10?4:q.a>=5&&q.b>=5?5.5:5;
+  return base*(.9+Math.random()*.2);
+}
+function nextCpuQuestion(){
+  const bank=questionBank();
+  if(!cpuQuestionBag.length){cpuQuestionBag=[...bank];shuffle(cpuQuestionBag);}
+  const index=cpuQuestionBag.findIndex(q=>q.key!==cpuPreviousKey);
+  const q=index>=0?cpuQuestionBag.splice(index,1)[0]:bank.filter(q=>q.key!==cpuPreviousKey)[ri(0,bank.filter(q=>q.key!==cpuPreviousKey).length-1)];
+  cpuQuestion={...q,seconds:cpuSolveSeconds(q)};cpuPreviousKey=q.key;cpuSolveLeft=cpuQuestion.seconds*60;
+}
+function tickCpuQuestion(){
+  if(!cpuQuestion)return;
+  cpuSolveLeft--;
+  if(cpuSolveLeft<=0){cPts++;cpuTotalCoins++;cpuAnswerCount++;cpuLastSolved={...cpuQuestion};nextCpuQuestion();}
+}
+function refillCpuPlan(){
+  const order=['soldier','tank','airplane','robot'];
+  cpuPlanQueue=['soldier','soldier','tank','tank','airplane','airplane','robot'].filter(cpuUnlocked);shuffle(cpuPlanQueue);
   if(cpuSpawnCount===0){
-    if(cPts>=1){cPts-=1;spawn('soldier','cpu');cpuSpawnCount++;} return;
+    const soldier=cpuPlanQueue.indexOf('soldier');cpuPlanQueue.splice(soldier,1);cpuPlanQueue.unshift('soldier');
+    const newest=order[currentLevel];
+    if(newest!=='soldier'){cpuPlanQueue.splice(cpuPlanQueue.indexOf(newest),1);cpuPlanQueue.splice(1,0,newest);}
+  }else if(cpuPlanQueue[0]===cpuPurchaseHistory.at(-1)){
+    const alternate=cpuPlanQueue.findIndex(type=>type!==cpuPlanQueue[0]);
+    if(alternate>0)[cpuPlanQueue[0],cpuPlanQueue[alternate]]=[cpuPlanQueue[alternate],cpuPlanQueue[0]];
   }
-
-  // ② 前 60 秒：不出機器人，依累計出兵數 + 解鎖狀態決定兵種
-  if(t<3600){
-    if(cPts>=5&&cpuSpawnCount>=5&&cpuUnlocked('airplane')&&r<0.40){cPts-=5;spawn('airplane','cpu');cpuSpawnCount++;return;}
-    if(cPts>=3&&cpuSpawnCount>=3&&cpuUnlocked('tank')&&r<0.50){cPts-=3;spawn('tank','cpu');cpuSpawnCount++;return;}
-    if(cPts>=1){cPts-=1;spawn('soldier','cpu');cpuSpawnCount++;}
-    return;
+}
+function cpuAI(){
+  if(!running||paused||prepPhase)return;
+  if(currentLevel===0&&units.filter(u=>u.side==='cpu'&&u.hp>0).length>=2)return;
+  if(!cpuPlanQueue.length)refillCpuPlan();
+  // React to aircraft with an available anti-air unit; otherwise save for the planned purchase.
+  if(cpuUnlocked('airplane')&&units.some(u=>u.side==='player'&&u.fly&&u.hp>0)&&!units.some(u=>u.side==='cpu'&&(u.fly||u.type==='robot')&&u.hp>0)&&!['airplane','robot'].includes(cpuPlanQueue[0])){
+    const plane=cpuPlanQueue.indexOf('airplane');if(plane>=0){cpuPlanQueue.splice(plane,1);cpuPlanQueue.unshift('airplane');}
   }
-
-  // ③ 60 秒後：完整策略，但仍需解鎖才可出機器人
-  if(cPts>=10&&cpuUnlocked('robot')){cPts-=10;spawn('robot','cpu');cpuSpawnCount++;return;}
-  if(cPts>=7&&cpuUnlocked('robot')&&r<0.50)return; // 存錢等機器人
-  if(cPts>=5&&cpuUnlocked('airplane')){
-    if(r<0.55){cPts-=5;spawn('airplane','cpu');cpuSpawnCount++;}
-    else if(cPts>=3&&cpuUnlocked('tank')){cPts-=3;spawn('tank','cpu');cpuSpawnCount++;}
-    else if(cPts>=1){cPts-=1;spawn('soldier','cpu');cpuSpawnCount++;}
-    return;
-  }
-  if(cPts>=3&&cpuUnlocked('tank')){
-    if(r<0.60){cPts-=3;spawn('tank','cpu');cpuSpawnCount++;}
-    else if(cPts>=1){cPts-=1;spawn('soldier','cpu');cpuSpawnCount++;}
-    return;
-  }
-  if(cPts>=1){cPts-=1;spawn('soldier','cpu');cpuSpawnCount++;}
+  const type=cpuPlanQueue[0],cost=UDEFS[type].cost;
+  if(cPts<cost)return;
+  cPts-=cost;spawn(type,'cpu');cpuSpawnCount++;cpuPlanQueue.shift();cpuPurchaseHistory.push(type);
+  if(cpuPurchaseHistory.length>40)cpuPurchaseHistory.shift();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -623,7 +704,7 @@ function castleHit(hx,hy){
   }
 }
 function spawnSmoke(castleX,hp){
-  const top=GY-CH,cnt=hp<MAX_HP*.3?3:1;
+  const top=GY-CH,cnt=hp<levelCastleHP(castleX===C_CX?'cpu':'player')*.3?3:1;
   for(let i=0;i<cnt;i++){
     debrisArr.push({x:castleX+8+Math.random()*72,y:top+10+Math.random()*80,
       vx:(Math.random()-.5)*.4,vy:-.6-Math.random()*.8,
@@ -637,6 +718,7 @@ function spawnSmoke(castleX,hp){
 function update(){
   if(!running||paused)return;
 
+  tickCpuQuestion(); // 電腦和玩家都可在備戰時答題存點數
   // 準備期倒數
   if(prepPhase){
     prepFrames++;
@@ -646,14 +728,12 @@ function update(){
   }
 
   gameFrames++;
-  // CPU 金幣累積（每 3~10 秒隨機加一枚）
-  if(++cpuCoinTimer>=cpuCoinInterval){cpuCoinTimer=0;cpuCoinInterval=ri(180,600);cPts++;cpuTotalCoins++;}
-  // CPU 出兵嘗試（隨機間隔 4~8 秒）
-  if(++cpuSpendTimer>=cpuSpendInterval){cpuSpendTimer=0;cpuSpendInterval=ri(240,480);cpuAI();}
+  // CPU 出兵決策（第一關保留較慢節奏，其他關約 3～5 秒）
+  if(++cpuSpendTimer>=cpuSpendInterval){cpuSpendTimer=0;cpuSpendInterval=cpuSpendDelay();cpuAI();}
   // 受損城堡產生煙霧
   if(gameFrames%40===0){
-    if(pHP<MAX_HP*.7)spawnSmoke(P_CX,pHP);
-    if(cHP<MAX_HP*.7)spawnSmoke(C_CX,cHP);
+    if(pHP<levelCastleHP()*.7)spawnSmoke(P_CX,pHP);
+    if(cHP<levelCastleHP('cpu')*.7)spawnSmoke(C_CX,cHP);
   }
 
   // ── Unit update ──
@@ -671,6 +751,7 @@ function update(){
       if(u.type==='soldier'){u.state='die';u.animFrame=0;u.animTick=0;sfx('soldierDie',200);continue;}
       else{sfx('unitDie',200);boom(u.x+u.sz/2,u.y+u.sz/2,u.sz*.75);units.splice(i,1);continue;}
     }
+    u.artTick++;if(u.fireAnim>0)u.fireAnim--;
     // ── 動畫幀更新（走路/攻擊） ──
     u.animTick++;if(u.animTick>=S_TPF){u.animTick=0;u.animFrame=(u.animFrame+1)%S_COLS;}
     const isP=u.side==='player';
@@ -680,7 +761,7 @@ function update(){
       if(dist<=u.range){
         did=true;u.timer++;
         if(u.timer>=u.cd){
-          u.timer=0;
+          u.timer=0;u.fireAnim=12;
           const tx=en.x+en.sz/2,ty=en.y+en.sz/2;
           const usePt=(u.type==='airplane'&&en.fly)?'missile':u.pt;
           if(usePt==='laser'){const ly=u.y+u.sz*(u.foy??0.5);en.hp-=u.dmg;efx.push({k:'laser',x1:isP?u.x+u.sz:u.x,y1:ly,x2:tx,y2:ty,life:14,max:14});sfx('laser');}
@@ -693,7 +774,7 @@ function update(){
       if(cd2<=u.range){
         did=true;u.timer++;
         if(u.timer>=u.cd){
-          u.timer=0;
+          u.timer=0;u.fireAnim=12;
           const tx=cx+CW/2,ty=GY-CH/2;
           const usePt=u.type==='airplane'?'bomb':u.pt;
           if(usePt==='laser'){const ly=u.y+u.sz*(u.foy??0.5);if(isP){cHP-=u.dmg;castleHit(tx,ty);}else{pHP-=u.dmg;castleHit(tx,ty);}efx.push({k:'laser',x1:isP?u.x+u.sz:u.x,y1:ly,x2:tx,y2:ty,life:14,max:14});sfx('laser');redraw();}
@@ -839,10 +920,10 @@ function drawCastle(x,side,hp){
   const fpx=isP?x+CW-9:x+9,fpy=top-bH-30;ctx.strokeStyle='#999';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(fpx,fpy);ctx.lineTo(fpx,fpy+30);ctx.stroke();
   const fd=isP?1:-1;ctx.fillStyle=flagC;ctx.beginPath();ctx.moveTo(fpx,fpy);ctx.lineTo(fpx+fd*24,fpy+7);ctx.lineTo(fpx,fpy+14);ctx.closePath();ctx.fill();
   // 裂縫（輕度受損時出現）
-  if(hp<MAX_HP*.75){const al=Math.min(.95,(1-hp/MAX_HP)*1.4);ctx.strokeStyle=`rgba(200,80,0,${al})`;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x+14,top+16);ctx.lineTo(x+24,top+44);ctx.lineTo(x+18,top+68);ctx.stroke();ctx.beginPath();ctx.moveTo(x+52,top+30);ctx.lineTo(x+44,top+58);ctx.lineTo(x+52,top+84);ctx.stroke();}
+  if(hp<levelCastleHP(side)*.75){const al=Math.min(.95,(1-hp/levelCastleHP(side))*1.4);ctx.strokeStyle=`rgba(200,80,0,${al})`;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x+14,top+16);ctx.lineTo(x+24,top+44);ctx.lineTo(x+18,top+68);ctx.stroke();ctx.beginPath();ctx.moveTo(x+52,top+30);ctx.lineTo(x+44,top+58);ctx.lineTo(x+52,top+84);ctx.stroke();}
   // 火焰效果（動態，依受損程度增強）
-  if(hp<MAX_HP*.75){
-    const dmg=1-hp/MAX_HP,t=gameFrames*.08;
+  if(hp<levelCastleHP(side)*.75){
+    const dmg=1-hp/levelCastleHP(side),t=gameFrames*.08;
     const pts=[];
     if(dmg>.25)pts.push({fx:x+20,fy:GY-55},{fx:x+62,fy:GY-68});
     if(dmg>.50)pts.push({fx:x+10,fy:GY-CH*.52+top},{fx:x+68,fy:GY-CH*.42+top});
@@ -946,9 +1027,9 @@ function drawUnit(u){
     ctx.save();
     if(u.side!=='player'){ctx.translate(u.x+u.sz/2,u.y+u.sz/2);ctx.scale(-1,1);ctx.translate(-(u.x+u.sz/2),-(u.y+u.sz/2));}
     const x=u.x,y=u.y,s=u.sz,en=(u.side==='cpu');
-    if(u.type==='tank')     dTank(x,y,s,en);
-    if(u.type==='airplane') dPlane(x,y,s,en);
-    if(u.type==='robot')    dRobot(x,y,s,en);
+    if(u.type==='tank')     dTank(x,y,s,en,u);
+    if(u.type==='airplane') dPlane(x,y,s,en,u);
+    if(u.type==='robot')    dRobot(x,y,s,en,u);
     ctx.restore();
   }
   // 血條：士兵用 spriteTop（精靈實際頂端）定位，其他兵種用碰撞框上方
@@ -978,9 +1059,55 @@ function dSoldier(x,y,s,en,u){
   ctx.fillStyle='#f7d7af';ctx.beginPath();ctx.arc(s*.75,s*.53,s*.07,0,Math.PI*2);ctx.fill();
   ctx.restore();
 }
-function dTank(x,y,s,en){ctx.fillStyle=en?'#333':'#37474F';ctx.fillRect(x,y+s*.6,s,s*.37);ctx.fillStyle=en?'#222':'#263238';for(let i=0;i<6;i++){ctx.beginPath();ctx.arc(x+s*.08+i*s*.16,y+s*.78,s*.1,0,Math.PI*2);ctx.fill();}ctx.fillStyle=en?'#C62828':'#1565C0';ctx.fillRect(x+s*.04,y+s*.3,s*.92,s*.33);ctx.fillStyle=en?'#B71C1C':'#0D47A1';ctx.fillRect(x+s*.22,y+s*.06,s*.56,s*.27);ctx.fillStyle=en?'#555':'#455A64';ctx.fillRect(x+s*.74,y+s*.13,s*.34,s*.11);ctx.fillStyle='rgba(255,255,255,.1)';[.1,.85].forEach(cx2=>{ctx.beginPath();ctx.arc(x+s*cx2,y+s*.46,s*.04,0,Math.PI*2);ctx.fill();});}
-function dPlane(x,y,s,en){ctx.fillStyle=en?'#E64A19':'#7B1FA2';ctx.beginPath();ctx.ellipse(x+s*.5,y+s*.45,s*.5,s*.19,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=en?'#BF360C':'#4A148C';ctx.beginPath();ctx.moveTo(x+s,y+s*.38);ctx.lineTo(x+s*1.16,y+s*.45);ctx.lineTo(x+s,y+s*.52);ctx.fill();ctx.fillStyle=en?'#F4511E':'#9C27B0';ctx.beginPath();ctx.moveTo(x+s*.45,y+s*.45);ctx.lineTo(x+s*.2,y+s*.92);ctx.lineTo(x+s*.65,y+s*.55);ctx.fill();ctx.beginPath();ctx.moveTo(x+s*.45,y+s*.45);ctx.lineTo(x+s*.2,y+s*.02);ctx.lineTo(x+s*.65,y+s*.38);ctx.fill();ctx.fillStyle=en?'#BF360C':'#6A1B9A';ctx.beginPath();ctx.moveTo(x,y+s*.45);ctx.lineTo(x-s*.07,y+s*.2);ctx.lineTo(x+s*.1,y+s*.45);ctx.fill();ctx.fillStyle=en?'#FFD54F':'#80D8FF';ctx.beginPath();ctx.ellipse(x+s*.75,y+s*.4,s*.14,s*.11,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#1c1c1c';ctx.beginPath();ctx.ellipse(x+s*.45,y+s*.74,s*.07,s*.11,0,0,Math.PI*2);ctx.fill();}
-function dRobot(x,y,s,en){ctx.fillStyle=en?'#1A1A3E':'#BF360C';ctx.fillRect(x+s*.18,y+s*.82,s*.24,s*.18);ctx.fillRect(x+s*.58,y+s*.82,s*.24,s*.18);ctx.fillStyle=en?'#311B92':'#E64A19';ctx.fillRect(x+s*.1,y+s*.5,s*.8,s*.34);ctx.fillStyle=en?'#1A1A3E':'#BF360C';ctx.fillRect(x-s*.07,y+s*.5,s*.19,s*.3);ctx.fillRect(x+s*.88,y+s*.5,s*.19,s*.3);ctx.fillStyle='rgba(255,255,255,.08)';ctx.fillRect(x+s*.24,y+s*.56,s*.52,s*.22);ctx.fillStyle=en?'#4527A0':'#FF5722';ctx.fillRect(x+s*.12,y+s*.22,s*.76,s*.3);ctx.fillStyle=en?'#512DA8':'#E64A19';ctx.fillRect(x+s*.16,y,s*.68,s*.25);ctx.shadowColor=en?'#FF1744':'#00E5FF';ctx.shadowBlur=14;ctx.fillStyle=en?'#FF1744':'#00E5FF';ctx.fillRect(x+s*.24,y+s*.06,s*.18,s*.12);ctx.fillRect(x+s*.58,y+s*.06,s*.18,s*.12);ctx.shadowBlur=0;ctx.fillStyle=en?'#D50000':'#00BCD4';ctx.beginPath();ctx.arc(x+s*1.02,y+s*.65,s*.08,0,Math.PI*2);ctx.fill();ctx.shadowColor=en?'#FF1744':'#00E5FF';ctx.shadowBlur=10;ctx.fillStyle=en?'#FF8A80':'#E0F7FA';ctx.beginPath();ctx.arc(x+s*1.02,y+s*.65,s*.045,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#aaa';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x+s*.5,y);ctx.lineTo(x+s*.5,y-s*.17);ctx.stroke();ctx.fillStyle=en?'#FF5252':'#FF9800';ctx.beginPath();ctx.arc(x+s*.5,y-s*.2,s*.055,0,Math.PI*2);ctx.fill();}
+function artRect(x,y,w,h,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
+function artEllipse(x,y,rx,ry,color){ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill();}
+function dTank(x,y,s,en,u){
+  const t=(u?.artTick||0)+(u?.id||0)*5,walk=u?.state==='walk',recoil=(u?.fireAnim||0)/12;
+  ctx.save();ctx.translate(x,y+(walk?Math.sin(t*.18)*.7:0));
+  artEllipse(s*.5,s*.96,s*.55,s*.065,'#4b635d26');
+  artRect(0,s*.64,s,s*.32,8,'#627c83');artRect(s*.03,s*.68,s*.94,s*.24,7,'#435d66');
+  for(let i=0;i<5;i++){const cx=s*.12+i*s*.19,cy=s*.80;artEllipse(cx,cy,s*.08,s*.08,'#a6b8b8');ctx.strokeStyle='#5b757d';ctx.lineWidth=2;const angle=walk?t*.13+i:0;ctx.beginPath();ctx.moveTo(cx-Math.cos(angle)*s*.055,cy-Math.sin(angle)*s*.055);ctx.lineTo(cx+Math.cos(angle)*s*.055,cy+Math.sin(angle)*s*.055);ctx.stroke();}
+  for(let i=0;i<6;i++)artRect(((i*s/6+(walk?t*.6:0))%s),s*.66,s*.065,s*.035,1,'#d1ddd4');
+  artRect(s*.02,s*.38,s*.95,s*.31,6,en?'#dea28b':'#86b8cd');artRect(s*.08,s*.39,s*.78,s*.065,2,en?'#f2c8ad':'#c1e0e5');
+  ctx.save();ctx.translate(-recoil*s*.075,0);
+  artRect(s*.20,s*.14,s*.54,s*.29,7,en?'#d18d75':'#70a4bf');artRect(s*.31,s*.12,s*.25,s*.07,3,en?'#e9bb9e':'#a9d1dc');
+  artRect(s*.68,s*.24,s*.44,s*.11,3,'#718d97');artRect(s*1.02,s*.22,s*.09,s*.15,2,'#506c78');
+  if(recoil>.5){ctx.fillStyle='#ffe2a0';ctx.beginPath();ctx.moveTo(s*1.1,s*.22);ctx.lineTo(s*(1.25+recoil*.1),s*.295);ctx.lineTo(s*1.1,s*.37);ctx.closePath();ctx.fill();}
+  ctx.restore();
+  artRect(s*.14,s*.45,s*.19,s*.1,3,'#e8f2dd');artEllipse(s*.86,s*.56,s*.055,s*.055,'#fff1ba');
+  if(walk){ctx.globalAlpha=.23;artEllipse(-s*.1-(t%14)/2,s*.55,3+(t%14)/4,3,'#829c98');}
+  ctx.restore();
+}
+function dPlane(x,y,s,en,u){
+  const t=(u?.artTick||0)+(u?.id||0)*8,bob=Math.sin(t*.085)*2,fire=(u?.fireAnim||0)/12;
+  ctx.save();ctx.translate(x+s*.5,y+s*.45+bob);ctx.rotate(Math.sin(t*.065)*.035);
+  ctx.fillStyle=en?'#e4ae96':'#b8cede';ctx.beginPath();ctx.moveTo(-s*.1,-s*.08);ctx.lineTo(-s*.4,-s*.48);ctx.quadraticCurveTo(-s*.05,-s*.45,s*.2,-s*.04);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(-s*.1,s*.03);ctx.lineTo(-s*.38,s*.45);ctx.quadraticCurveTo(s*.06,s*.33,s*.23,s*.04);ctx.closePath();ctx.fill();
+  artEllipse(0,0,s*.5,s*.19,en?'#d98f78':'#78a9c4');artEllipse(s*.26,-s*.04,s*.16,s*.11,'#d7edf0');
+  artEllipse(s*.28,-s*.025,s*.045,s*.065,'#f4d4af');artEllipse(s*.30,-s*.045,s*.025,s*.022,'#718d9a');
+  ctx.fillStyle=en?'#be7d6b':'#5d8fab';ctx.beginPath();ctx.moveTo(-s*.43,-s*.03);ctx.lineTo(-s*.51,-s*.3);ctx.lineTo(-s*.29,-s*.09);ctx.closePath();ctx.fill();
+  artRect(-s*.53,s*.03,s*.24,s*.04,2,'#e8eee0');
+  artEllipse(s*.47,0,s*.08,s*.11,'#eed6a6');
+  ctx.save();ctx.translate(s*.52,0);ctx.rotate(t*.45);artEllipse(0,0,s*.035,s*.30,'#fff5deaa');ctx.restore();
+  artEllipse(s*.52,0,s*.05,s*.05,'#5e7c89');
+  if(fire>0){artRect(-s*.10,s*.13,s*.20,s*.06,2,'#587383');artEllipse(0,s*.24+(1-fire)*s*.25,s*.055,s*.08,'#e4bd73');}
+  ctx.globalAlpha=.3;ctx.strokeStyle='#eaf8e8';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-s*.55,0);ctx.lineTo(-s*(.65+(t%18)/100),0);ctx.stroke();ctx.restore();
+}
+function dRobot(x,y,s,en,u){
+  const t=(u?.artTick||0)+(u?.id||0)*7,walk=u?.state==='walk',step=walk?Math.sin(t*.13):0,recoil=(u?.fireAnim||0)/12;
+  ctx.save();ctx.translate(x,y+(walk?Math.abs(step)*-1:Math.sin(t*.035)*.4));
+  artEllipse(s*.5,s*.98,s*.48,s*.065,'#506d6424');
+  for(const [lx,phase] of [[s*.25,step],[s*.66,-step]]){artRect(lx,s*.71+phase*2,s*.15,s*.19,4,'#778f97');artEllipse(lx+s*.075,s*.75+phase*2,s*.095,s*.095,en?'#ce957f':'#95bdce');artRect(lx-s*.025+phase*2,s*.88,s*.22,s*.10,3,'#597782');}
+  artRect(s*.17,s*.38,s*.66,s*.38,9,en?'#dca48b':'#9cc4d3');artRect(s*.27,s*.46,s*.46,s*.22,5,en?'#f3cab0':'#d6e9ea');
+  const glow=.65+.35*Math.sin(t*.065);ctx.globalAlpha=glow;artEllipse(s*.5,s*.56,s*.065,s*.065,en?'#eaab66':'#76b3c4');ctx.globalAlpha=1;
+  ctx.save();ctx.translate(0,walk?step*2:0);artRect(s*.04,s*.42,s*.17,s*.26,5,en?'#c68c76':'#7da6b8');artEllipse(s*.11,s*.65,s*.095,s*.085,'#637f8b');ctx.restore();
+  ctx.save();ctx.translate(-recoil*s*.055,walk?-step:0);artRect(s*.79,s*.44,s*.20,s*.19,5,en?'#c68c76':'#7da6b8');artRect(s*.91,s*.48,s*.17,s*.13,3,'#627f8a');artEllipse(s*1.04,s*.54,s*.07,s*.07,recoil>0?'#fff5af':'#a5d8dc');ctx.restore();
+  artRect(s*.19,s*.06,s*.62,s*.31,9,en?'#d2947e':'#87b2c5');artRect(s*.26,s*.14,s*.48,s*.14,5,'#526e7c');
+  const blink=t%160<6;for(const eye of [.36,.62])artRect(s*eye,s*.18,s*.08,blink?s*.025:s*.065,2,'#d6f4df');
+  artRect(s*.43,s*.31,s*.16,s*.025,1,'#7291a0');ctx.strokeStyle='#7e9695';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(s*.5,s*.07);ctx.lineTo(s*.5,-s*.05);ctx.stroke();artEllipse(s*.5,-s*.065,s*.05,s*.05,Math.sin(t*.08)>0?'#eccf79':'#b9d6c4');
+  if(recoil>.5){ctx.globalAlpha=recoil;artEllipse(s*1.11,s*.54,s*.06,s*.06,'#e8f6bf');}
+  ctx.restore();
+}
 
 // ── Projectiles ────────────────────────────────────────────
 function drawProj(p){
@@ -996,29 +1123,34 @@ function drawLaser(e){const a=e.life/e.max;ctx.strokeStyle=`rgba(0,229,255,${a*.
 //  UI
 // ═══════════════════════════════════════════════════════════
 function redraw(){
-  const pr=Math.max(0,pHP)/MAX_HP*100,cr=Math.max(0,cHP)/MAX_HP*100;
+  document.getElementById('levelTag').textContent=`第 ${currentLevel+1} / ${LEVELS.length} 關 · ${LEVELS[currentLevel].name}`;
+  const pr=Math.max(0,pHP)/levelCastleHP()*100,cr=Math.max(0,cHP)/levelCastleHP('cpu')*100;
   document.getElementById('pHpB').style.width=pr+'%';
   document.getElementById('cHpB').style.width=cr+'%';
   document.getElementById('pHpN').textContent=Math.max(0,Math.floor(pHP));
   document.getElementById('cHpN').textContent=Math.max(0,Math.floor(cHP));
   document.getElementById('myPts').textContent=pPts;
   const pb=document.getElementById('pHpB');
-  if(pHP<MAX_HP*.3)pb.style.background='linear-gradient(90deg,#B71C1C,#EF9A9A)';
-  else if(pHP<MAX_HP*.6)pb.style.background='linear-gradient(90deg,#E65100,#FFCC80)';
+  if(pHP<levelCastleHP()*.3)pb.style.background='linear-gradient(90deg,#B71C1C,#EF9A9A)';
+  else if(pHP<levelCastleHP()*.6)pb.style.background='linear-gradient(90deg,#E65100,#FFCC80)';
   else pb.style.background='linear-gradient(90deg,#48a8d7,#8ddce4)';
-  document.getElementById('diffTag').textContent=running&&prepPhase?`備戰 ${Math.ceil((PREP_DUR-prepFrames)/60)} 秒 · 答題儲存點數`:(difficulty==='easy'?'10以內加法':'20以內加法');
+  document.getElementById('diffTag').textContent=running&&prepPhase?`備戰 ${Math.ceil((PREP_DUR-prepFrames)/60)} 秒 · 答題儲存點數`:(currentLevel===0?'5以內加法':difficulty==='easy'?'10以內加法':'20以內加法');
   const canBuy=running&&!prepPhase&&!paused;
   const UNIT_COST={soldier:1,tank:3,airplane:5,robot:10};
   const UNIT_COST_LBL={soldier:'💰1點',tank:'💰3點',airplane:'💰5點',robot:'💰10點'};
   const btnMap=[['bS','soldier'],['bT','tank'],['bA','airplane'],['bR','robot']];
+  document.getElementById('ubtns').dataset.visible=String(currentLevel+1);
   btnMap.forEach(([id,type])=>{
     const btn=document.getElementById(id);
     const uc=btn.querySelector('.uc');
     const unlocked=playerUnlocked(type);
+    btn.hidden=!unlocked;
+    btn.classList.toggle('ub-poor',unlocked&&pPts<UNIT_COST[type]);
+    btn.title=unlocked&&pPts<UNIT_COST[type]?`點數不足，還差 ${UNIT_COST[type]-pPts} 點`:'';
     if(!unlocked){
       btn.disabled=true;
       btn.classList.add('ub-locked');
-      uc.textContent=`🔒 答對${UNLOCK[type]}題`;
+      uc.textContent=`🔒 第 ${UNLOCK[type]} 關開放`;
     }else{
       btn.classList.remove('ub-locked');
       uc.textContent=UNIT_COST_LBL[type];
@@ -1027,18 +1159,22 @@ function redraw(){
   });
 }
 function gameOver(pWin){
+  clearRoundTimers();running=false;paused=false;stopBgMusic();questionDelay=0;resultMode=pWin?'won':'lost';
+  document.getElementById('pauseOv').style.display='none';
+  const final=currentLevel===LEVELS.length-1;
+  document.getElementById('restBtn').textContent=pWin?(final?'🔄 再玩四關':'下一關 →'):'🔄 重新挑戰本關';
   const ov=document.getElementById('ov');
   const ot=document.getElementById('ovtitle'),om=document.getElementById('ovmsg');
   if(pWin){
     ov.style.background='rgba(94,156,173,.45)'; // 半透明，煙火可透出
-    ot.textContent='🎉 人類勝利！';ot.style.color='#347e9c';
-    om.textContent='電腦城堡已被摧毀！你的數學很厲害！';
+    ot.textContent=final?'🎉 四關全部通過！':`🎉 第 ${currentLevel+1} 關勝利！`;ot.style.color='#347e9c';
+    om.textContent=final?'士兵、坦克、飛機和機器人，全都一起守住了城堡！':`城堡守住了！下一關開放${['','坦克','飛機','機器人'][currentLevel+1]}。`;
     sfx('victory',0);
     startVictoryFW();
   }else{
     ov.style.background='rgba(122,151,158,.65)';
     ot.textContent='💀 電腦勝利！';ot.style.color='#bd655f';
-    om.textContent='人類城堡淪陷了…再試一次吧！';
+    om.textContent=`第 ${currentLevel+1} 關再一起試一次，這次也有收穫！`;
     sfx('defeat',0);
   }
   ov.style.display='flex';
@@ -1056,7 +1192,7 @@ function loop(timestamp){
     stepFrame();
     frameBudget-=1000/60;
   }
-  render();redraw();
+  _bgLoop();render();redraw();
   requestAnimationFrame(loop);
 }
 function stepFrame(){

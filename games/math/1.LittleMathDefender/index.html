@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Little Math Defender</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <link rel="preload" as="image" href="background.webp" fetchpriority="high">
+    <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root {
             --primary-red: #ff4757;
@@ -62,6 +63,7 @@
             border: none; border-radius: 20px; cursor: pointer; color: white; transition: 0.3s;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
+        .mode-btn:disabled { opacity: .55; cursor: wait; }
         .mode-btn.add { background: #2ecc71; } 
         .mode-btn.sub { background: #3498db; } 
         .mode-btn.inf { background: #9b59b6; grid-column: span 2; font-size: 38px; } 
@@ -83,7 +85,7 @@
 
         #score-board { position: absolute; top: 20px; left: 180px; background: rgba(0,0,0,0.85); color: #f1c40f; padding: 12px 35px; border-radius: 40px; font-size: 44px; z-index: 100; font-weight: 900; border: 3px solid #f1c40f; box-shadow: 0 0 25px rgba(241,196,15,0.4); letter-spacing: 3px; }
         
-        #battle-scene { width: 75%; height: 100%; background: url('background.png') no-repeat center center/cover; position: relative; border-right: 6px solid #1e272e; }
+        #battle-scene { width: 75%; height: 100%; background: #a7cbd7 url('background.webp') no-repeat center center/cover; position: relative; border-right: 6px solid #1e272e; }
         #ui-side-panel { width: 25%; height: 100%; background: var(--ui-bg); display: flex; flex-direction: column; align-items: center; padding: 40px 20px; color: white; z-index: 20; }
         #question-display { font-size: 85px; font-weight: bold; color: #fff; margin-bottom: 30px; }
         .options-list { display: flex; flex-direction: column; gap: 16px; width: 100%; }
@@ -171,12 +173,13 @@
         <div id="start-screen" class="overlay-screen">
             <div class="overlay-title" style="color: #f1c40f;">Little Math Defender</div>
             <div class="overlay-text">Choose a mode to defend the wall!</div>
+            <div id="background-status" role="status" style="font-size:20px; margin-bottom:16px;">Loading background… 背景載入中</div>
             <div class="mode-grid">
-                <button class="mode-btn add" onclick="startGame(1)">Addition to 10</button>
-                <button class="mode-btn add" onclick="startGame(2)">Addition to 20</button>
-                <button class="mode-btn sub" onclick="startGame(3)">Subtraction to 10</button>
-                <button class="mode-btn sub" onclick="startGame(4)">Subtraction to 20</button>
-                <button class="mode-btn inf" onclick="startGame(5)">🔥 Endless Mixed Mode 🔥</button>
+                <button class="mode-btn add" disabled onclick="startGame(1)">Addition to 10</button>
+                <button class="mode-btn add" disabled onclick="startGame(2)">Addition to 20</button>
+                <button class="mode-btn sub" disabled onclick="startGame(3)">Subtraction to 10</button>
+                <button class="mode-btn sub" disabled onclick="startGame(4)">Subtraction to 20</button>
+                <button class="mode-btn inf" disabled onclick="startGame(5)">🔥 Endless Mixed Mode 🔥</button>
             </div>
         </div>
 
@@ -432,7 +435,28 @@ function stopBGM() {
     if (bgmInterval) { clearInterval(bgmInterval); bgmInterval = null; }
 }
 
+// The preload and CSS use the same URL, so the browser shares one request.
+let backgroundReady = false;
+const backgroundImage = new Image();
+backgroundImage.fetchPriority = 'high';
+async function prepareBackground() {
+    const status = document.getElementById('background-status');
+    try {
+        backgroundImage.src = 'background.webp';
+        await backgroundImage.decode();
+        backgroundReady = true;
+        status.textContent = '';
+    } catch (error) {
+        // Keep the game usable on an unavailable image, with a solid-color fallback.
+        backgroundReady = true;
+        status.textContent = 'Background unavailable. Using a plain backdrop. 背景載入失敗，使用純色背景。';
+    }
+    document.querySelectorAll('.mode-btn').forEach(button => button.disabled = false);
+}
+prepareBackground();
+
 function startGame(mode) {
+    if (!backgroundReady || state.gameActive) return;
     if (audioCtx.state === 'suspended' && !state.isMuted) audioCtx.resume();
     state.gameMode = mode; state.gameActive = true;
     document.getElementById('start-screen').style.display = 'none';
@@ -619,7 +643,7 @@ document.getElementById('missile-btn').onclick = () => {
                     addKill(); 
                 });
                 
-                confetti({ particleCount: 180, spread: 100, origin: { x: (targetHitX / 1280), y: (mY / 720) } });
+                if (typeof confetti === 'function') confetti({ particleCount: 180, spread: 100, origin: { x: (targetHitX / 1280), y: (mY / 720) } });
             }
         }, 16);
     }
@@ -711,8 +735,8 @@ function triggerVictory() {
     const duration = 3000;
     const end = Date.now() + duration;
     (function frame() {
-        confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff4757', '#2ecc71', '#f1c40f'] });
-        confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff4757', '#2ecc71', '#f1c40f'] });
+        if (typeof confetti === 'function') confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff4757', '#2ecc71', '#f1c40f'] });
+        if (typeof confetti === 'function') confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff4757', '#2ecc71', '#f1c40f'] });
         if (Date.now() < end) requestAnimationFrame(frame);
     }());
 

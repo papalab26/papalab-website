@@ -80,7 +80,18 @@ function pickQuestion(){
  if(!deck.length){deck=shuffle([...deckPool]);if(deck[deck.length-1].id===lastId)deck.unshift(deck.pop());}
  question=deck.pop();if(food){foodBag=deck;foodPrevious=question.id;}else{if(night)nightBag=deck;else bag=deck;previous=question.id;}return pool;
 }
-const VEGETABLES=[{id:'carrot',word:'carrot',name:'胡蘿蔔'},{id:'corn',word:'corn',name:'玉米'},{id:'cabbage',word:'cabbage',name:'高麗菜'},{id:'broccoli',word:'broccoli',name:'花椰菜'},{id:'tomato',word:'tomato',name:'番茄'},{id:'lettuce',word:'lettuce',name:'萵苣'}];
+const VEGETABLES=[{id:'carrot',word:'carrot',name:'胡蘿蔔'},{id:'corn',word:'corn',name:'玉米'},{id:'cabbage',word:'cabbage',name:'高麗菜'},{id:'broccoli',word:'broccoli',name:'花椰菜'},{id:'tomato',word:'tomato',name:'番茄'},{id:'lettuce',word:'lettuce',name:'萵苣'},
+ {id:'apple',word:'apple',name:'蘋果'},{id:'banana',word:'banana',name:'香蕉'},{id:'orange',word:'orange',name:'橘子'},
+ {id:'strawberry',word:'strawberry',name:'草莓'},{id:'watermelon',word:'watermelon',name:'西瓜'},{id:'grapes',word:'grapes',name:'葡萄'},
+ {id:'pineapple',word:'pineapple',name:'鳳梨'},{id:'pear',word:'pear',name:'梨子'},{id:'cucumber',word:'cucumber',name:'小黃瓜'},{id:'pumpkin',word:'pumpkin',name:'南瓜'}];
+// 延用各動物的飲食偏好，新增食物也能被吃掉；肉食動物不改為吃蔬果。
+const FRUITS=['apple','banana','orange','strawberry','watermelon','grapes','pineapple','pear'];
+for(const a of ALL_ANIMALS){
+ if(['elephant','monkey','raccoon','porcupine','mouse'].includes(a.id))a.diet.push(...FRUITS,'cucumber','pumpkin');
+ else if(['bird','parrot','bushbaby'].includes(a.id))a.diet.push(...FRUITS);
+ else if(['zebra','turtle','hippo','warthog','antelope'].includes(a.id))a.diet.push('apple','pear','cucumber','pumpkin');
+ else if(['giraffe','rhino','buffalo','ostrich','duck','flamingo'].includes(a.id))a.diet.push('cucumber','pumpkin');
+}
 const $=id=>document.getElementById(id),canvas=$('scene'),ctx=canvas.getContext('2d');
 let W=1000,H=650,animals=[],foods=[],pending=null,question=null,selected=null,bag=[],nightBag=[],previous=null,foodBag=[],foodPrevious=null,quizKind='animal',sound=true,last=0,time=0,worldTime=20,toastTimer,voice=null,foodUid=0,saveElapsed=0;
 const LEGACY_STORE='papalab-savanna-friends-v1';
@@ -162,7 +173,7 @@ function restore(){restoreBase();try{const raw=JSON.parse(localStorage.getItem(S
  if(r.roundTrips===1||r.roundTrips===2)a.roundTrips=r.roundTrips;if(Number.isFinite(r.passesLeft))a.passesLeft=clamp(r.passesLeft,0,4);if(r.state==='exiting')a.state='exiting';skyItems.push(a);}
  }catch(e){}}
 function updateCounts(){$('species-total').textContent=ALL_ANIMALS.length;$('count').textContent=animals.length;$('species').textContent=new Set(animals.map(a=>a.id)).size;$('food-count').textContent=foods.length;if(!pending){$('hint').hidden=animals.length>0;$('hint').textContent=animals.length?'':'按 ＋ 加朋友'}}
-function nextQuestion(){hideEntityLabel();const pool=pickQuestion();selected=null;$('feedback').textContent='';$('confirm').disabled=true;$('options').replaceChildren();$('quiz-title').textContent="What's this?";$('quiz-label').textContent=quizKind==='food'?'FOOD FOR OUR FRIENDS':'MEET A NEW FRIEND';$('animal-picture').setAttribute('aria-label',quizKind==='food'?'題目蔬菜插畫':skyDef(question.id)?'題目天空物件插畫':'題目動物插畫');const choices=shuffle([question,...shuffle(pool.filter(a=>a.id!==question.id)).slice(0,3)]);for(const a of choices){const b=document.createElement('button');b.className='option';b.dataset.id=a.id;b.setAttribute('aria-pressed','false');b.innerHTML=a.word+' <span aria-hidden="true">♫</span>';b.onclick=()=>{selected=a;for(const o of $('options').children){o.classList.remove('selected','wrong');o.setAttribute('aria-pressed',String(o===b))}b.classList.add('selected');$('confirm').disabled=false;$('feedback').textContent='按 ✓ 確認';speak(a.word)};$('options').append(b)}const pic=$('animal-picture'),pc=pic.getContext('2d');pc.clearRect(0,0,pic.width,pic.height);if(quizKind==='food')drawFood(pc,question.id,200,180,145,5);else if(skyDef(question.id))drawSkyItem(pc,{id:question.id,x:200,y:115,dir:1,age:0},160);else drawAnimal(pc,question.id,200,205,['giraffe','ostrich','flamingo','antelope'].includes(question.id)?110:140,1,time,0,false);}
+function nextQuestion(){hideEntityLabel();const pool=pickQuestion();selected=null;$('feedback').textContent='';$('confirm').disabled=true;$('options').replaceChildren();$('quiz-title').textContent="What's this?";$('quiz-label').textContent=quizKind==='food'?'FOOD FOR OUR FRIENDS':'MEET A NEW FRIEND';$('animal-picture').setAttribute('aria-label',quizKind==='food'?'題目蔬果插畫':skyDef(question.id)?'題目天空物件插畫':'題目動物插畫');const choices=shuffle([question,...shuffle(pool.filter(a=>a.id!==question.id)).slice(0,3)]);for(const a of choices){const b=document.createElement('button');b.className='option';b.dataset.id=a.id;b.setAttribute('aria-pressed','false');b.innerHTML=a.word+' <span aria-hidden="true">♫</span>';b.onclick=()=>{selected=a;for(const o of $('options').children){o.classList.remove('selected','wrong');o.setAttribute('aria-pressed',String(o===b))}b.classList.add('selected');$('confirm').disabled=false;$('feedback').textContent='按 ✓ 確認';speak(a.word)};$('options').append(b)}const pic=$('animal-picture'),pc=pic.getContext('2d');pc.clearRect(0,0,pic.width,pic.height);if(quizKind==='food')drawFood(pc,question.id,200,180,145,5);else if(skyDef(question.id))drawSkyItem(pc,{id:question.id,x:200,y:115,dir:1,age:0},160);else drawAnimal(pc,question.id,200,205,['giraffe','ostrich','flamingo','antelope'].includes(question.id)?110:140,1,time,0,false);}
 function openQuiz(kind='animal'){if(pending||!$('quiz').hidden)return;quizKind=kind;if(kind==='animal'&&animals.length>=MAX_ANIMALS&&skyItems.length>=MAX_SKY){toast('草原已有 40 位朋友，先陪牠們玩吧！');return}if(kind==='food'&&foods.length>=MAX_FOODS){toast('草地上已有 20 份蔬菜，先讓朋友吃一些吧！');return}nextQuestion();$('quiz').hidden=false;$('close').focus()}
 function closeQuiz(){silence();$('quiz').hidden=true;$(quizKind==='food'?'food':'add').focus()}
 function finishPlacement(){pending=null;$('hint').classList.remove('placing');$('cancel').hidden=true;$('add').hidden=false;$('food').hidden=false;updateCounts()}
@@ -421,9 +432,77 @@ function drawAnimal(c,id,x,y,size,dir,t,action,moving,mode='wander'){const previ
 function drawFood(c,id,x,y,size,bites){const scale=.28+.72*bites/5;c.save();c.translate(x,y);ellipse(c,0,0,size*.32*scale,size*.065*scale,'#52653e24');c.scale(size*scale,size*scale);
  if(id==='carrot'){for(const [x,y] of [[-.18,-.83],[0,-.93],[.17,-.83]])curve(c,[0,-.59,x*.5,-.76,x,-.7,x,y],.055,'#679655');c.fillStyle='#efa656';c.beginPath();c.moveTo(-.18,-.63);c.quadraticCurveTo(.02,-.73,.18,-.63);c.quadraticCurveTo(.2,-.4,-.08,-.08);c.quadraticCurveTo(-.23,-.36,-.18,-.63);c.fill();for(let i=0;i<3;i++)line(c,-.14+i*.015,-.53+i*.13,-.025+i*.015,-.51+i*.13,.018,'#d88744')}
  if(id==='corn'){ellipse(c,0,-.42,.19,.36,'#edc865');for(let r=0;r<6;r++)for(let j=0;j<3;j++)ellipse(c,-.11+j*.11,-.68+r*.1,.041,.037,j%2?'#ffe5a0':'#f4d573');c.fillStyle='#7aa16c';c.beginPath();c.moveTo(-.08,-.06);c.quadraticCurveTo(-.4,-.14,-.29,-.62);c.quadraticCurveTo(-.08,-.37,-.08,-.06);c.fill();c.beginPath();c.moveTo(.03,-.04);c.quadraticCurveTo(.39,-.26,.27,-.69);c.quadraticCurveTo(.07,-.46,.03,-.04);c.fill()}
- if(id==='cabbage'||id==='lettuce'){const pale=id==='cabbage';for(let i=0;i<7;i++){const a=i*Math.PI*2/7;ellipse(c,Math.cos(a)*.16,-.38+Math.sin(a)*.15,.19,.22,pale?'#9eb77c':'#73a26b')}ellipse(c,0,-.4,.25,.25,pale?'#c5d6a4':'#9abd7d');for(let i=0;i<4;i++)curve(c,[-.18+i*.11,-.58,-.09+i*.1,-.43,-.12+i*.08,-.32,-.05+i*.06,-.19],.012,pale?'#8ea970':'#6e995e')}
+ if(id==='cabbage'){
+  // 緊密圓球、包覆外葉和淡色葉脈，與長葉萵苣的輪廓不同。
+  ellipse(c,-.20,-.27,.17,.23,'#71934e');ellipse(c,.20,-.26,.18,.23,'#7c9e56');
+  ellipse(c,0,-.37,.30,.31,'#abc57c');ellipse(c,-.045,-.43,.24,.23,'#c6d99a');
+  curve(c,[-.27,-.38,-.06,-.39,-.18,-.13,.02,-.08],.025,'#e5edc0');
+  curve(c,[.28,-.42,.07,-.36,.17,-.13,.02,-.08],.024,'#e5edc0');
+  curve(c,[-.17,-.58,.10,-.65,.22,-.42,.12,-.22],.018,'#93b366');
+  curve(c,[.04,-.64,-.13,-.56,-.18,-.35,-.08,-.20],.014,'#eef1cf');
+  for(const side of [-1,1])for(let i=0;i<3;i++)curve(c,[side*.03,-.12-i*.09,side*.13,-.13-i*.09,side*.17,-.18-i*.10,side*.25,-.22-i*.09],.009,'#d7e5b3');
+ }
+ if(id==='lettuce'){
+  // 開展的羅蔓萵苣：狹長葉片、波浪葉緣、明顯中肋。
+  for(const [x,y,a,col] of [[-.18,-.38,-.48,'#498448'],[.18,-.38,.48,'#578e48'],[-.09,-.48,-.22,'#74a953'],[.10,-.47,.25,'#80b55b'],[0,-.50,0,'#a0c770']]){
+   c.save();c.translate(x,y);c.rotate(a);c.fillStyle=col;c.beginPath();c.moveTo(0,.40);
+   c.bezierCurveTo(-.07,.29,-.16,.10,-.13,.01);c.bezierCurveTo(-.22,-.05,-.12,-.12,-.16,-.19);
+   c.bezierCurveTo(-.19,-.27,-.08,-.34,0,-.32);c.bezierCurveTo(.10,-.37,.17,-.26,.13,-.19);
+   c.bezierCurveTo(.20,-.12,.11,-.06,.14,.01);c.bezierCurveTo(.19,.13,.07,.29,0,.40);c.fill();
+   curve(c,[0,.35,-.015,.13,.015,-.13,0,-.27],.018,'#e0e9ad');
+   for(const side of [-1,1])for(let i=0;i<3;i++)curve(c,[0,.18-i*.13,side*.04,.13-i*.13,side*.07,.09-i*.13,side*.10,.05-i*.13],.008,'#c7dc98');c.restore();
+  }ellipse(c,0,-.09,.055,.035,'#e4e7bb');
+ }
  if(id==='broccoli'){line(c,0,-.13,0,-.43,.17,'#aac786');line(c,0,-.34,-.18,-.5,.07,'#aac786');line(c,0,-.34,.19,-.52,.07,'#aac786');for(const [x,y,r] of [[-.23,-.52,.16],[.23,-.55,.16],[0,-.68,.2],[0,-.48,.16]])ellipse(c,x,y,r,r,'#679865');for(let i=0;i<9;i++)ellipse(c,-.25+(i%3)*.2,-.58-Math.floor(i/3)*.055,.03,.027,'#8bb27a')}
  if(id==='tomato'){ellipse(c,0,-.38,.3,.29,'#df806c');ellipse(c,-.1,-.48,.09,.045,'#f1b3a080');for(let i=0;i<5;i++){const a=i*Math.PI*2/5;line(c,0,-.64,Math.cos(a)*.14,-.64+Math.sin(a)*.07,.027,'#759b61')}line(c,0,-.65,.03,-.78,.04,'#759b61')}
+
+ if(id==='apple'){
+  c.fillStyle='#d95040';c.beginPath();c.moveTo(0,-.66);c.bezierCurveTo(-.32,-.83,-.44,-.44,-.25,-.16);c.bezierCurveTo(-.13,.01,-.04,-.08,0,-.07);c.bezierCurveTo(.09,.03,.27,-.04,.33,-.32);c.bezierCurveTo(.42,-.60,.21,-.79,0,-.66);c.fill();
+  curve(c,[0,-.65,0,-.74,.04,-.76,.045,-.83],.035,'#815539');ellipse(c,.12,-.78,.12,.045,'#619442');ellipse(c,-.16,-.49,.045,.11,'#f4a48c');
+ }
+ if(id==='banana'){
+  c.fillStyle='#f2cd48';c.beginPath();c.moveTo(-.31,-.62);c.bezierCurveTo(-.14,-.13,.22,-.11,.34,-.61);c.bezierCurveTo(.38,-.31,.22,-.02,-.07,-.10);c.bezierCurveTo(-.32,-.16,-.39,-.40,-.31,-.62);c.fill();
+  curve(c,[-.29,-.58,-.14,-.18,.14,-.20,.30,-.53],.022,'#ffe798');line(c,-.31,-.61,-.33,-.69,.065,'#8b7443');line(c,.33,-.59,.34,-.64,.038,'#7e6840');
+ }
+ if(id==='orange'){
+  ellipse(c,0,-.38,.31,.30,'#ed9b32');ellipse(c,-.10,-.47,.11,.09,'#f7be58');
+  for(let i=0;i<26;i++){const a=i*2.4,r=.08+(i%4)*.045;ellipse(c,Math.cos(a)*r,-.38+Math.sin(a)*r,.009,.010,'#d77f29');}
+  line(c,0,-.67,.015,-.75,.032,'#6f8044');ellipse(c,.10,-.71,.12,.043,'#629346');
+ }
+ if(id==='strawberry'){
+  c.fillStyle='#df4f4c';c.beginPath();c.moveTo(-.26,-.57);c.bezierCurveTo(-.31,-.36,-.16,-.12,0,-.07);c.bezierCurveTo(.18,-.18,.34,-.42,.25,-.58);c.quadraticCurveTo(0,-.72,-.26,-.57);c.fill();
+  for(let r=0;r<4;r++)for(let j=0;j<3;j++){const x=(j-1)*(.15-r*.028);ellipse(c,x,-.52+r*.10,.012,.022,'#ffe29a');}
+  for(let i=0;i<5;i++){const a=i*Math.PI*2/5;curve(c,[0,-.61,Math.cos(a)*.08,-.65+Math.sin(a)*.04,Math.cos(a)*.16,-.65+Math.sin(a)*.08,Math.cos(a)*.22,-.65+Math.sin(a)*.09],.04,'#56894a');}
+ }
+ if(id==='watermelon'){
+  ellipse(c,0,-.36,.39,.30,'#457d48');c.save();c.beginPath();c.ellipse(0,-.36,.39,.30,0,0,Math.PI*2);c.clip();
+  for(let i=-2;i<=2;i++)curve(c,[i*.16,-.67,i*.19+.08,-.50,i*.19-.06,-.24,i*.16,-.04],.046,'#89ac54');c.restore();
+  // 一片切開的西瓜顯示紅色果肉與黑籽，協助小朋友辨識。
+  c.fillStyle='#4c8948';c.beginPath();c.moveTo(-.16,-.28);c.lineTo(.44,-.28);c.quadraticCurveTo(.16,.18,-.16,-.28);c.fill();
+  c.fillStyle='#e9e5a8';c.beginPath();c.moveTo(-.12,-.28);c.lineTo(.40,-.28);c.quadraticCurveTo(.16,.12,-.12,-.28);c.fill();
+  c.fillStyle='#e76c66';c.beginPath();c.moveTo(-.08,-.28);c.lineTo(.36,-.28);c.quadraticCurveTo(.16,.065,-.08,-.28);c.fill();for(const x of [.02,.12,.23,.30])ellipse(c,x,-.20,.012,.019,'#584a43');
+ }
+ if(id==='grapes'){
+  curve(c,[-.02,-.73,.02,-.80,.08,-.78,.12,-.84],.035,'#7f7145');ellipse(c,.16,-.76,.12,.06,'#66974e');
+  for(const [x,y] of [[-.17,-.57],[.02,-.59],[.19,-.54],[-.13,-.39],[.07,-.40],[.21,-.36],[-.06,-.23],[.11,-.22],[.03,-.09]]){ellipse(c,x,y,.11,.11,'#84609f');ellipse(c,x-.028,y-.035,.028,.022,'#baa0cc');}
+ }
+ if(id==='pineapple'){
+  ellipse(c,0,-.34,.24,.32,'#d8a34a');c.save();c.beginPath();c.ellipse(0,-.34,.24,.32,0,0,Math.PI*2);c.clip();
+  for(let i=-4;i<5;i++){line(c,-.4,-.75+i*.13,.4,.05+i*.13,.016,'#aa7c32');line(c,.4,-.75+i*.13,-.4,.05+i*.13,.016,'#f1ca76');}c.restore();
+  for(const [x,y] of [[-.26,-.84],[-.16,-1.0],[0,-1.05],[.16,-.98],[.27,-.82]]){c.fillStyle=x<0?'#508458':'#6b995b';c.beginPath();c.moveTo(-.05,-.59);c.quadraticCurveTo(x*.35,-.79,x,y);c.quadraticCurveTo(x*.75,-.67,.06,-.58);c.fill();}
+ }
+ if(id==='pear'){
+  c.fillStyle='#bac565';c.beginPath();c.moveTo(-.09,-.64);c.bezierCurveTo(-.13,-.49,-.33,-.43,-.31,-.24);c.bezierCurveTo(-.27,.04,.30,.03,.31,-.25);c.bezierCurveTo(.32,-.43,.13,-.49,.10,-.65);c.quadraticCurveTo(0,-.76,-.09,-.64);c.fill();
+  curve(c,[0,-.69,.025,-.77,.015,-.8,.05,-.86],.035,'#886343');ellipse(c,.14,-.78,.11,.035,'#688b43');ellipse(c,-.15,-.29,.045,.09,'#dce4a0');for(let i=0;i<12;i++)ellipse(c,Math.sin(i*2.4)*.20,-.19-(i%4)*.08,.008,.008,'#98a254');
+ }
+ if(id==='cucumber'){
+  c.save();c.translate(0,-.38);c.rotate(.62);ellipse(c,0,0,.13,.39,'#4c864a');ellipse(c,-.045,-.03,.023,.30,'#7ead65');
+  for(let i=0;i<15;i++)ellipse(c,(i%3-1)*.065,-.28+Math.floor(i/3)*.135,.009,.015,'#a0bc71');ellipse(c,0,-.37,.043,.02,'#718c4b');c.restore();
+ }
+ if(id==='pumpkin'){
+  ellipse(c,0,-.31,.34,.28,'#d98432');for(const [x,rx,col] of [[-.22,.12,'#e79b3d'],[.22,.12,'#dd8b32'],[-.11,.13,'#f0ac49'],[.11,.13,'#e99b3c'],[0,.12,'#f3b653']])ellipse(c,x,-.31,rx,.28,col);
+  curve(c,[0,-.58,-.01,-.68,.04,-.69,.03,-.77],.07,'#637644');curve(c,[.05,-.67,.26,-.80,.31,-.54,.18,-.58],.015,'#778d4a');
+ }
  c.restore();}
 function mix(a,b,t){const parse=s=>s.match(/\w\w/g).map(v=>parseInt(v,16)),x=parse(a.replace('#','')),y=parse(b.replace('#',''));return '#'+x.map((v,i)=>Math.round(v+(y[i]-v)*clamp(t,0,1)).toString(16).padStart(2,'0')).join('')}
 function makeSkyItem(id,x,y){const roundTrips=Math.random()<.5?1:2;return {id,x,y,baseY:y,age:0,dir:id==='meteor'?(x>W*.6?-1:1):Math.random()<.5?-1:1,speed:id==='meteor'?220:id==='airplane'?random(80,105):random(55,75),roundTrips,passesLeft:roundTrips*2,state:'cruise'};}

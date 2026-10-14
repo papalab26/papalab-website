@@ -8,7 +8,7 @@ with sync_playwright() as p:
  page.set_content((ROOT/'index.html').read_text())
  # Every food still has four valid choices and removes exactly five portions.
  page.evaluate("skyQuestionAvailable=()=>false;speechSynthesis.speak=()=>{};speechSynthesis.cancel=()=>{};const originalMake=makeAnimal;makeAnimal=(...args)=>({...originalMake(...args),lifeLeft:9999,nextSocial:9999})")
- for i in range(6):
+ for i in range(page.evaluate('VEGETABLES.length')):
   page.locator('#food').click();q=page.evaluate('question.id');opts=page.locator('.option').evaluate_all('(els)=>els.map(e=>e.dataset.id)')
   assert len(set(opts))==4 and q in opts
   page.locator(f'.option[data-id="{q}"]').click();page.locator('#confirm').click()
@@ -40,5 +40,5 @@ with sync_playwright() as p:
   assert page.evaluate('pond().x+pond().rx>W && pond().y+pond().ry>H')
  assert not errors,errors
  assert not requests,requests
- print('PASS 六種食物問答與五次份量、陸地動物繞池塘、舊食物位置轉換、320px 直向／橫向及單檔無外部請求／JS 錯誤。')
+ print('PASS 完整食物題庫問答與五次份量、陸地動物繞池塘、舊食物位置轉換、320px 直向／橫向及單檔無外部請求／JS 錯誤。')
  b.close()

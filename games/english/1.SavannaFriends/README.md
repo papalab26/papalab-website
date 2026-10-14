@@ -7,6 +7,7 @@ Papa-Lab 基礎英文學習遊戲，正式遊戲目錄為 `games/english/1.Savan
 - 點動物圖示，看圖片選四個英文單字；點選可聽發音，確認答對後點場景放置。蔬果圖示開啟食物問答。
 - 白天原本 24 種動物與飛機、直升機共 26 種等權洗牌，各平均約 3.85%。晚上只抽貓頭鷹、蝙蝠、狐狸、刺蝟、浣熊、老鼠、豪豬、Bushbaby，以及星星和流星；夜間天空題目機率約 25%。答案選項依時段篩選。
 - 共 32 種動物，隨機慢走／加快、友善追逐、喝水、休息；夜行動物晚上活動、白天各自入睡。從放置起停留 60～120 秒後走／游／飛出畫面。食物依飲食偏好吸引朋友，五口逐次縮小後消失。
+- 食物共 16 種：胡蘿蔔、玉米、高麗菜、綠花椰菜、番茄、萵苣，加上蘋果、香蕉、橘子、草莓、西瓜、葡萄、鳳梨、梨子、小黃瓜、南瓜。萵苣採狹長波浪葉與白色中肋，高麗菜採緊密圓球與包覆葉脈；蔬果保留自然輪廓與辨識特徵。新增食物沿用問答、發音、放置、五口縮小和存檔，並加入合適動物的食物偏好。
 - 星星到天亮消失，流星短暫飛過；飛機／直升機往返 1 或 2 趟後飛走。
 - 40 隻動物、20 份食物、12 個天空物件上限。答題及隱藏分頁時暫停活動倒數。動物名稱出現在身旁，主面板新增按鈕為圖示。
 - 主畫面移除標題列，喇叭／靜音 SVG 按鈕位於草原右上角，只有圖示；保留無障礙標籤與 48px 觸控區域。
@@ -25,6 +26,7 @@ Papa-Lab 基礎英文學習遊戲，正式遊戲目錄為 `games/english/1.Savan
 ```sh
 python3 games/english/1.SavannaFriends/tests/features.py
 python3 games/english/1.SavannaFriends/tests/regression.py
+python3 games/english/1.SavannaFriends/tests/foods.py
 python3 games/english/1.SavannaFriends/tests/placement_feedback.py
 python3 games/english/1.SavannaFriends/tests/lifecycle.py
 python3 games/english/1.SavannaFriends/tests/chasing.py

@@ -307,7 +307,7 @@ function drawNocturnalFriend(c,id,t,action,moving,bend,rest){
  if(id==='owl'){
   if(!rest&&!moving)for(const x of [-.11,.13]){line(c,x,-.12,x,-.02,.035,'#be9b69');line(c,x,-.02,x+.06,-.02,.025,'#be9b69');}
   ellipse(c,0,-.38,.29,.33,color);ellipse(c,.03,-.32,.20,.22,'#e9dcc4');
-  for(const side of [-1,1]){c.save();c.translate(side*.18,-.47);c.rotate(side*(moving?Math.sin(t*10)*.6+.65:.05));ellipse(c,side*.10,.10,.13,moving?.29:.19,'#86979c');c.restore();}
+  for(const side of [-1,1]){c.save();c.translate(side*.18,-.47);c.rotate(side*(moving?-(Math.sin(t*10)*.6+.65):.05));ellipse(c,side*.10,.10,.13,moving?.29:.19,'#86979c');c.restore();}
   ellipse(c,0,-.76,.31,.25,color);for(const side of [-1,1]){ellipse(c,side*.135,-.76,.137,.16,'#f3e7ca');ellipse(c,side*.135,-.75,.067,.074,'#dfbc76');eye(c,side*.135,-.75);}
   c.fillStyle='#d7a878';c.beginPath();c.moveTo(-.04,-.68);c.lineTo(.04,-.68);c.lineTo(0,-.60);c.fill();
   for(const [x,y]of [[-.1,-.39],[.07,-.40],[-.02,-.26]])curve(c,[x-.035,y-.01,x-.02,y+.02,x+.02,y+.02,x+.035,y-.01],.012,'#b5a58b');return;

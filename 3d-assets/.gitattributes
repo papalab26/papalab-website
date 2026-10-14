@@ -1,0 +1,4 @@
+# 第三方與生成檔保留原始格式；GitHub 將手寫程式列為主要審查內容。
+preview/vendor/* linguist-vendored=true -whitespace
+preview/rifleman-standalone.html linguist-generated=true -whitespace
+models/rifleman/*-report.json linguist-generated=true

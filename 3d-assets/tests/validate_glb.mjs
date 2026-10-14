@@ -1,0 +1,10 @@
+import { readFileSync, writeFileSync } from 'node:fs';
+import { resolve,dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import validator from 'gltf-validator';
+const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
+const bytes=new Uint8Array(readFileSync(resolve(root,'models/rifleman/rifleman.glb')));
+const report=await validator.validateBytes(bytes,{uri:'rifleman.glb',maxIssues:1000});
+writeFileSync(resolve(root,'models/rifleman/gltf-validation-report.json'),JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify(report.issues,null,2));
+if(report.issues.numErrors)process.exit(1);

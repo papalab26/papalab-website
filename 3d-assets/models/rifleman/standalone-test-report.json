@@ -1,0 +1,41 @@
+{
+  "animations": {
+    "Aim": {
+      "seconds": 0.75,
+      "tracks": 51,
+      "max_bone_matrix_change": 0.24192206662501073
+    },
+    "Death": {
+      "seconds": 1.5,
+      "tracks": 51,
+      "max_bone_matrix_change": 2.3555036925821806
+    },
+    "Hit": {
+      "seconds": 0.5833333134651184,
+      "tracks": 51,
+      "max_bone_matrix_change": 0.4053930366954643
+    },
+    "Idle": {
+      "seconds": 2,
+      "tracks": 51,
+      "max_bone_matrix_change": 0.03078594640590704
+    },
+    "Shoot": {
+      "seconds": 0.5,
+      "tracks": 51,
+      "max_bone_matrix_change": 0.09291484254129073
+    },
+    "Walk": {
+      "seconds": 1,
+      "tracks": 51,
+      "max_bone_matrix_change": 0.8391586160411146
+    }
+  },
+  "skinned_meshes": 1,
+  "bones": 17,
+  "foot_min_y": -2.635599724437507e-09,
+  "height": 1.9500000476837158,
+  "draw_calls_100": 102,
+  "webgl": true,
+  "preview_mode": "standalone"
+}

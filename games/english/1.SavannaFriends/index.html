@@ -279,6 +279,13 @@ function drawNewSavannaFriend(c,id,t,action,moving,bend,rest){
  if(id==='cheetah'){line(c,hx+.075,hy-.012,hx+.11,hy+.085,.02,'#8a7053');ellipse(c,hx-.05,hy-.07,.016,.016,'#8a7053');}
  eye(c,hx+.055,hy-.035);
 }
+// 遠側獠牙先畫、再由臉與口鼻遮住牙根；近側獠牙從下唇往外上彎。
+function drawWarthogTusk(c,hx,hy,near){
+ c.save();c.translate(hx,hy);c.fillStyle=near?'#f1e3c7':'#d3c7aa';c.beginPath();
+ if(near){c.moveTo(.22,.14);c.quadraticCurveTo(.44,.24,.49,-.09);c.quadraticCurveTo(.54,.16,.25,.18);}
+ else{c.moveTo(.20,.11);c.quadraticCurveTo(.35,.14,.38,-.105);c.quadraticCurveTo(.44,.12,.23,.15);}
+ c.closePath();c.fill();c.restore();
+}
 function drawMoreSavannaFriend(c,id,t,action,moving,bend,rest){
  const color=animalDef(id).color,step=moving?Math.sin(t*8)*.055:0;
  if(id==='meerkat'){
@@ -323,10 +330,11 @@ function drawMoreSavannaFriend(c,id,t,action,moving,bend,rest){
  const hx=bend?.54:.37,hy=bend?-.22:hyena?-.74:-.66;
  if(id==='jackal')for(const side of [-1,1]){c.fillStyle=color;c.beginPath();c.moveTo(hx+side*.12-.05,hy-.10);c.lineTo(hx+side*.14,hy-.33);c.lineTo(hx+side*.12+.065,hy-.10);c.fill();}
  else for(const side of [-1,1]){ellipse(c,hx+side*.13,hy-.14,.072,.075,color);ellipse(c,hx+side*.13,hy-.15,.033,.038,'#d5b6a0');}
+ if(warthog)drawWarthogTusk(c,hx,hy,false);
  ellipse(c,hx,hy,warthog?.23:.18,warthog?.19:.18,color);
  if(warthog){
   ellipse(c,hx+.18,hy+.055,.18,.12,'#c7aca0');ellipse(c,hx+.27,hy+.045,.018,.026,'#8e7770');ellipse(c,hx+.16,hy+.045,.018,.026,'#8e7770');
-  curve(c,[hx+.01,hy+.10,hx+.07,hy+.14,hx+.14,hy+.08,hx+.10,hy-.025],.037,'#f1dfba');ellipse(c,hx-.09,hy+.02,.05,.05,'#9a8272');
+  drawWarthogTusk(c,hx,hy,true);ellipse(c,hx-.09,hy+.02,.05,.05,'#9a8272');
  }else{ellipse(c,hx+.14,hy+.07,id==='jackal'?.17:.14,.078,'#dfc5a0');ellipse(c,hx+.26,hy+.045,.032,.026,'#746c58');}
  eye(c,hx+.035,hy-.035);
 }
@@ -503,7 +511,7 @@ function drawAnimalDetails(c,id,t,bend,rest){
   for(let i=0;i<5;i++)stroke([-.23+i*.05,-.81,-.19+i*.05,-.73,-.10+i*.04,-.70,-.07+i*.04,-.70],'#d78f92');return;
  }
  if(id==='warthog'){
-  const hx=bend?.54:.37,hy=bend?-.22:-.66;stroke([hx+.01,hy+.11,hx+.21,hy+.20,hx+.31,hy+.12,hx+.27,hy+.005],'#ead9b7',.026);fur(-.31,-.50,10,'#9c8371');return;
+  fur(-.31,-.50,10,'#9c8371');return;
  }
  if(id==='meerkat'){
   const hx=bend?.26:.015,hy=bend?-.43:-.94;stroke([hx-.09,hy+.05,hx-.04,hy+.02,hx+.08,hy+.02,hx+.11,hy+.05],'#d7c69f');fur(-.08,-.58,5,'#ab8b66');return;

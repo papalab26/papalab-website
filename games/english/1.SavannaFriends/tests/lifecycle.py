@@ -43,10 +43,11 @@ with sync_playwright() as p:
   }""")
   assert all(result.values()),result
   # Every species starts leaving at its deadline, moves visibly and is removed, including sleepers.
+  # Allow the existing route planner one frame to discard an already-reached waypoint.
   result=page.evaluate("""()=>{
    worldTime=230;animals=ANIMALS.map((d,i)=>{const a=fitHabitat(makeAnimal(d.id,habitat(d.id)==='water'||habitat(d.id)==='shore'?pond().x:200,habitat(d.id)==='water'||habitat(d.id)==='shore'?pond().y:groundY(H*.7)));a.lifeLeft=1;a.nextSocial=a.nextRest=a.nextDrink=a.nextEat=999;return a;});update(.05);
    for(let i=0;i<18;i++)update(.05);const notEarly=animals.length===24&&animals.every(a=>a.mode!=='leaving');update(.06);
-   const departures=animals.every(a=>a.mode==='leaving');const x=animals[0].x,y=animals[0].y;update(.1);const moved=animals[0].x!==x||animals[0].y!==y;
+   const departures=animals.every(a=>a.mode==='leaving');const x=animals[0].x,y=animals[0].y;for(let i=0;i<3;i++)update(.05);const moved=animals[0].x!==x||animals[0].y!==y;
    for(let i=0;i<700;i++)update(.05);return {notEarly,departures,moved,empty:animals.length===0,count:$('count').textContent,species:$('species').textContent,saved:JSON.parse(localStorage.getItem(STORE)).animals.length};
   }""")
   assert result=={'notEarly':True,'departures':True,'moved':True,'empty':True,'count':'0','species':'0','saved':0},result

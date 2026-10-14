@@ -25,6 +25,7 @@ Papa-Lab 基礎英文學習遊戲，正式遊戲目錄為 `games/english/1.Savan
 
 ```sh
 python3 games/english/1.SavannaFriends/tests/features.py
+python3 games/english/1.SavannaFriends/tests/art.py
 python3 games/english/1.SavannaFriends/tests/regression.py
 python3 games/english/1.SavannaFriends/tests/foods.py
 python3 games/english/1.SavannaFriends/tests/placement_feedback.py
@@ -37,3 +38,7 @@ python3 games/english/1.SavannaFriends/tests/nocturnal.py
 包含桌面／手機直向與橫向的問答、發音呼叫、放置、存檔、日夜題庫隔離、姿勢像素、個別睡醒、變速與追逐、遠距離餵食、完整離場、天空生命週期及白天 260 次等權抽題。舊回歸測試在必要時延長測試動物停留時間或關閉額外抽題；自然生命週期與完整天空／夜晚題庫以獨立測試驗證。實體手機效能與語音聽感仍需實機確認。
 
 主畫面精簡已以 320×568、390×844、844×390、1280×850 確認新增 50～60px 場景高度、圖示位置及切換、觸控尺寸、底部按鈕完整可見及放置過程不被聲音按鈕中斷；既有靜音音效／放置及餵食天空測試通過。
+
+## 動物美術
+
+32 種動物維持可愛 2D 自然插畫，加入柔和明暗、細輪廓與各物種特徵，並檢查走路、休息、睡覺與喝水等姿勢。完整檢視與逐項調整見 [動物畫風檢視](ART_REVIEW.md)。

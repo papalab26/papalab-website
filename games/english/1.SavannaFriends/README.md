@@ -27,6 +27,7 @@ Papa-Lab 基礎英文學習遊戲，正式遊戲目錄為 `games/english/1.Savan
 python3 games/english/1.SavannaFriends/tests/features.py
 python3 games/english/1.SavannaFriends/tests/art.py
 python3 games/english/1.SavannaFriends/tests/hippo_water.py
+python3 games/english/1.SavannaFriends/tests/pond_water.py
 python3 games/english/1.SavannaFriends/tests/regression.py
 python3 games/english/1.SavannaFriends/tests/foods.py
 python3 games/english/1.SavannaFriends/tests/placement_feedback.py
@@ -45,3 +46,7 @@ python3 games/english/1.SavannaFriends/tests/nocturnal.py
 32 種動物維持可愛 2D 自然插畫，加入柔和明暗、細輪廓與各物種特徵，並檢查走路、休息、睡覺與喝水等姿勢。完整檢視與逐項調整見 [動物畫風檢視](ART_REVIEW.md)。
 
 河馬在池塘中下半身沒入水面，使用貼身水紋與移動尾流、小水花，不畫草地投影；草地與題目插畫仍顯示完整腳部。水中狀態依單次繪圖參數傳入並復原，避免影響後續題目插畫。
+
+## 池塘動物畫面
+
+檢視池塘全部 8 種動物後，河馬、鴨子、青蛙、烏龜、鱷魚與鵜鶘使用各自的下沉深度與水線裁切，露出背部、頭部或龜殼，游動時有尾流和小水花。紅鶴保持長腿站立涉水，水紋與小水花集中在腳邊，休息與睡覺也保留單腳支撐。魚全身在水下可見，使用淡透明度與移動氣泡，保留完整魚身與尾鰭。以上動物在水中皆取消草地投影；草地與題目插畫維持原造型。棲地、題庫、飲食與活動邏輯沿用原設定。

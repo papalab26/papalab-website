@@ -26,6 +26,7 @@ Papa-Lab 基礎英文學習遊戲，正式遊戲目錄為 `games/english/1.Savan
 ```sh
 python3 games/english/1.SavannaFriends/tests/features.py
 python3 games/english/1.SavannaFriends/tests/art.py
+python3 games/english/1.SavannaFriends/tests/hippo_water.py
 python3 games/english/1.SavannaFriends/tests/regression.py
 python3 games/english/1.SavannaFriends/tests/foods.py
 python3 games/english/1.SavannaFriends/tests/placement_feedback.py
@@ -42,3 +43,5 @@ python3 games/english/1.SavannaFriends/tests/nocturnal.py
 ## 動物美術
 
 32 種動物維持可愛 2D 自然插畫，加入柔和明暗、細輪廓與各物種特徵，並檢查走路、休息、睡覺與喝水等姿勢。完整檢視與逐項調整見 [動物畫風檢視](ART_REVIEW.md)。
+
+河馬在池塘中下半身沒入水面，使用貼身水紋與移動尾流、小水花，不畫草地投影；草地與題目插畫仍顯示完整腳部。水中狀態依單次繪圖參數傳入並復原，避免影響後續題目插畫。

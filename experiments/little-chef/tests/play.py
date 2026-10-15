@@ -13,7 +13,7 @@ def next_customer(page):
   page.evaluate('clock=phaseStart+.7');page.wait_for_function("phase==='serving'")
 def choose_order(page):
  for item in page.evaluate('order'):
-  page.locator(f'.food-card[data-id="{item}"]').click()
+  count=page.evaluate('spoken.length');page.locator(f'.food-card[data-id="{item}"]').click();assert page.evaluate('spoken.length')==count
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
  page=b.new_page(viewport={'width':390,'height':844},has_touch=True);errors=[];requests=[]
@@ -48,18 +48,24 @@ with sync_playwright() as p:
    page.evaluate('(n)=>startLevel(n)',stage)
    page.evaluate("id=>{deck=[def(id)];newOrder();}",item)
    assert page.evaluate('order[0]')==item
-   page.locator(f'.food-card[data-id="{item}"]').click();assert page.evaluate('spoken.at(-1)')==page.evaluate('def(order[0]).word')
+   assert page.locator('#order').inner_text()=='' and page.locator('#order svg').count()==1
+   assert page.locator('#order').get_attribute('aria-label')=='播放客人訂單'
+   page.locator('#order').click();assert page.evaluate('spoken.at(-1)')==page.evaluate('def(order[0]).word')
+   count=page.evaluate('spoken.length');page.locator(f'.food-card[data-id="{item}"]').click();assert page.evaluate('spoken.length')==count
    page.locator('#serve').click();assert page.evaluate('reaction.good')
  # Real level chooser + base replacement + topping replacement + unordered matching.
  for stage in (2,3):
   page.evaluate('startLevel(0)');page.locator('#levels').click();page.locator(f'[data-level="{stage}"]').click()
   assert page.evaluate('level')==stage and page.locator('.food-card').count()==11
+  assert page.locator('#order').inner_text()=='' and page.locator('#order').get_attribute('aria-label')=='播放客人訂單'
+  page.locator('#order').click();assert page.evaluate('spoken.at(-1)===order.map(id=>def(id).word).join(", ")')
   assert page.locator('#serve').is_disabled()
   page.locator('.food-card[data-id="rice"]').click();page.locator('.food-card[data-id="bread"]').click()
   assert page.evaluate("selected.includes('bread')&&!selected.includes('rice')")
   page.evaluate('selected=[];updateUI()')
   # Choose in reverse order; ingredient order must not change correctness.
-  for item in reversed(page.evaluate('order')):page.locator(f'.food-card[data-id="{item}"]').click()
+  for item in reversed(page.evaluate('order')):
+   count=page.evaluate('spoken.length');page.locator(f'.food-card[data-id="{item}"]').click();assert page.evaluate('spoken.length')==count
   assert page.locator('#serve').is_enabled();page.locator('#serve').click();assert page.evaluate('reaction.good')
  # Exact symmetric money at zero; a wrong order may be a negative balance, no free failures.
  page.evaluate("startLevel(0);money=0;selected=[options.find(d=>d.id!==order[0]).id];updateUI()")
@@ -81,11 +87,11 @@ with sync_playwright() as p:
  page.evaluate('money=60;progress=[2,3,0,0];save()');page.reload();assert page.evaluate('money===60&&progress[1]===3')
  assert not errors,errors
  assert not [url for url in requests if url.startswith('http') and not url.startswith('https://little-chef.test/')],requests
- print('PASS 四關實際點餐／八料理八飲料發音呼叫／配料替換與無序比對／正負10延後且單次結算／五單過關／排隊遞補／五種隨機反應與變臉像素／靜音與單音樂計時器／存檔／無外部資源與 JS 錯誤')
+ print('PASS 四關實際點餐／八料理八飲料僅訂單發音／訂單只有圖示／選項靜音／配料替換與無序比對／正負10延後且單次結算／五單過關／排隊遞補／五種隨機反應與變臉像素／靜音與單音樂計時器／存檔／無外部資源與 JS 錯誤')
  page.close()
  for w,h in [(320,568),(390,844),(844,390),(1280,850)]:
   page=b.new_page(viewport={'width':w,'height':h},has_touch=True);page.on('pageerror',lambda e:errors.append(str(e)));page.set_content(HTML.decode())
-  page.evaluate("speechSynthesis.speak=()=>{};speechSynthesis.cancel=()=>{}")
+  page.evaluate("window.spoken=[];speechSynthesis.speak=u=>spoken.push(u.text);speechSynthesis.cancel=()=>{}")
   page.locator('#start').click()
   for stage in range(4):
    page.locator('#levels').click();page.locator(f'[data-level="{stage}"]').click()

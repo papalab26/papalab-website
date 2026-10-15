@@ -27,7 +27,7 @@ with sync_playwright() as p:
  for i in range(5):
   seen.append(page.evaluate('order[0]'));opts=page.locator('.food-card').evaluate_all('(els)=>els.map(e=>e.dataset.id)')
   assert len(set(opts))==3 and seen[-1] in opts
-  before=page.evaluate('money');page.locator('#order').click();assert page.evaluate('spoken.at(-1)===def(order[0]).word')
+  before=page.evaluate('money');page.locator('#order').click();assert page.evaluate('spoken.at(-1)===def(order[0]).word+"."')
   choose_order(page);assert page.locator('#serve').is_enabled();page.locator('#serve').click()
   assert page.evaluate('phase==="reacting"&&money==='+str(before))
   assert page.locator('#serve').is_disabled()
@@ -50,7 +50,7 @@ with sync_playwright() as p:
    assert page.evaluate('order[0]')==item
    assert page.locator('#order').inner_text()=='' and page.locator('#order svg').count()==1
    assert page.locator('#order').get_attribute('aria-label')=='播放客人訂單'
-   page.locator('#order').click();assert page.evaluate('spoken.at(-1)')==page.evaluate('def(order[0]).word')
+   page.locator('#order').click();assert page.evaluate('spoken.at(-1)')==page.evaluate('def(order[0]).word+"."')
    count=page.evaluate('spoken.length');page.locator(f'.food-card[data-id="{item}"]').click();assert page.evaluate('spoken.length')==count
    page.locator('#serve').click();assert page.evaluate('reaction.good')
  # Real level chooser + base replacement + topping replacement + unordered matching.
@@ -58,7 +58,7 @@ with sync_playwright() as p:
   page.evaluate('startLevel(0)');page.locator('#levels').click();page.locator(f'[data-level="{stage}"]').click()
   assert page.evaluate('level')==stage and page.locator('.food-card').count()==11
   assert page.locator('#order').inner_text()=='' and page.locator('#order').get_attribute('aria-label')=='播放客人訂單'
-  page.locator('#order').click();assert page.evaluate('spoken.at(-1)===order.map(id=>def(id).word).join(", ")')
+  page.locator('#order').click();assert page.evaluate('spoken.at(-1)===order.map(id=>def(id).word).join(", ")+"."')
   assert page.locator('#serve').is_disabled()
   page.locator('.food-card[data-id="rice"]').click();page.locator('.food-card[data-id="bread"]').click()
   assert page.evaluate("selected.includes('bread')&&!selected.includes('rice')")

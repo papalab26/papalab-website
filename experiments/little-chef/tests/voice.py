@@ -23,7 +23,7 @@ with sync_playwright() as p:
  page.locator('#voice-choice').select_option('uk');page.locator('#voice-preview').click()
  assert page.evaluate("spoken.at(-1).voice==='uk'&&spoken.at(-1).lang==='en-GB'")
  page.locator('#voice-done').click();assert page.locator('#welcome').is_visible()
- page.locator('#start').click();assert page.evaluate("spoken.at(-1).voice==='uk'")
+ page.locator('#start').click();assert page.evaluate("spoken.at(-1).voice===(queue[0].gender==='female'?'natural-us':'uk')")
  count=page.evaluate('spoken.length');page.locator('.food-card').first.click();assert page.evaluate('spoken.length')==count
  page.locator('#levels').click();page.locator('#level-voice').click();assert page.locator('#voice-modal').is_visible()
  clock=page.evaluate('clock');page.wait_for_timeout(120);assert page.evaluate('clock')==clock

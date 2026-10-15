@@ -75,8 +75,8 @@ with sync_playwright() as p:
  assert len(report['types'])==5 and not report['repeat'],report
  # Delayed discovery genuinely changes the customer face before money changes.
  report=page.evaluate('''()=>{
-  startLevel(0);reaction={id:'gag',good:false,duration:4.9};phase='reacting';phaseStart=clock;const before=money,frames=[],greens=[];
-  for(const t of [.4,1.6,2.5]){clock=phaseStart+t;draw();frames.push(canvas.toDataURL());const p=c.getImageData(Math.floor(canvas.width*.26),Math.floor(canvas.height*.38),Math.floor(canvas.width*.18),Math.floor(canvas.height*.21)).data;let green=0;for(let i=0;i<p.length;i+=4)if(p[i+1]>p[i]*1.025&&p[i]>100&&p[i+2]<170)green++;greens.push(green);}
+  startLevel(0);reaction={id:'gag',good:false,duration:6.5};phase='reacting';phaseStart=clock;const before=money,frames=[],greens=[];
+  for(const t of [.4,2.9,3.7]){clock=phaseStart+t;draw();frames.push(canvas.toDataURL());const p=c.getImageData(Math.floor(canvas.width*.26),Math.floor(canvas.height*.38),Math.floor(canvas.width*.18),Math.floor(canvas.height*.21)).data;let green=0;for(let i=0;i<p.length;i+=4)if(p[i+1]>p[i]*1.025&&p[i]>100&&p[i+2]<170)green++;greens.push(green);}
   return {different:new Set(frames).size===3,greens,uncharged:money===before};
  }''')
  assert report['different'] and report['uncharged'] and report['greens'][1]>report['greens'][0]+200,report

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>「離家提醒」隱私權政策</title>
+  <meta name="description" content="Android App「離家提醒」的隱私權政策，說明位置、照片與第三方地圖服務如何被使用。">
+  <style>
+    :root {
+      --ink: #2c3e50;
+      --accent: #3498db;
+      --paper: #f4f7f6;
+      --card: #ffffff;
+      --line: #d5ddd9;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--paper);
+      color: #333;
+      line-height: 1.7;
+    }
+    header {
+      background: var(--ink);
+      color: #fff;
+      padding: 1.25rem 1.25rem 1rem;
+    }
+    header p {
+      margin: 0.35rem 0 0;
+      color: #d6e2ea;
+    }
+    main {
+      max-width: 42rem;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 3rem;
+    }
+    h1 {
+      font-size: 1.55rem;
+      line-height: 1.35;
+      margin: 0;
+    }
+    h2 {
+      font-size: 1.2rem;
+      color: var(--ink);
+      margin: 2rem 0 0.6rem;
+      padding-bottom: 0.25rem;
+      border-bottom: 2px solid var(--accent);
+    }
+    a { color: #1d6fa5; }
+    .meta {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+      margin: 1rem 0 0;
+    }
+    .meta p { margin: 0.2rem 0; }
+    ul { padding-left: 1.2rem; }
+    li { margin: 0.35rem 0; }
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 36rem;
+      font-size: 0.95rem;
+    }
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 0.7rem 0.75rem;
+      border-bottom: 1px solid var(--line);
+    }
+    th { background: #e8eef2; color: var(--ink); }
+    tr:last-child td { border-bottom: 0; }
+    footer {
+      max-width: 42rem;
+      margin: 0 auto;
+      padding: 0 1rem 2rem;
+      color: #556;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>「離家提醒」隱私權政策</h1>
+    <p>Android App 如何處理你的資料</p>
+  </header>
+  <main>
+    <div class="meta">
+      <p>生效日期：2026-10-31</p>
+      <p>開發者：Papalab26</p>
+      <p>聯絡方式：<a href="mailto:papalab26@gmail.com">papalab26@gmail.com</a></p>
+    </div>
+
+    <p>本政策說明 Android App「離家提醒」（套件名稱 dev.papalab.leave_home_reminder，以下簡稱「本 App」）如何處理你的資料。</p>
+
+    <h2>1. 摘要</h2>
+    <ul>
+      <li>本 App 不需要註冊帳號，沒有廣告，也沒有使用分析、追蹤或當機回報工具。</li>
+      <li>本 App 沒有開發者自己的伺服器。你的提醒、住家、地點、Wi-Fi 名稱、照片與紀錄都儲存在你的手機中，開發者無法取得。</li>
+      <li>只有在顯示地圖和你主動搜尋地點時，本 App 才會連到下面第 4 節列出的第三方地圖與搜尋服務。</li>
+    </ul>
+
+    <h2>2. 本 App 在手機上使用和儲存的資料</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">資料</th>
+            <th scope="col">用途</th>
+            <th scope="col">儲存位置與期限</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>位置（精確位置，包括 App 關閉或未使用時的背景位置）</td>
+            <td>在需要時判斷你是否離開住家，或到達、離開你儲存的地點</td>
+            <td>只在手機上判斷；住家與地點座標存在手機中，直到你刪除或解除安裝。沒有啟用中的到達或離開提醒時，不啟動地點監測，也不持續要求背景定位。已連上你設定的住家 Wi-Fi，而且目前的地點提醒都能靠這個連線判斷時，會暫停持續的 GPS 更新。斷線，或還有必須靠座標判斷的提醒（例如住家附近的自訂到達地點）時，仍會使用位置。這不是連上任何 Wi-Fi 就停止所有定位，也不撤回系統的位置權限。不同手機的位置指示不一定同時消失</td>
+          </tr>
+          <tr>
+            <td>住家設定（名稱、座標、範圍、Wi-Fi 名稱）</td>
+            <td>判斷你是否在家</td>
+            <td>存在手機中</td>
+          </tr>
+          <tr>
+            <td>目前連線的 Wi-Fi 名稱</td>
+            <td>跟你儲存的住家或臨時地點 Wi-Fi 名稱比對</td>
+            <td>只在手機上比對。穩定連線期間沿用程式內的快照，不會一直重讀名稱；連線、斷線、網路變更，或你手動讀取、用桌面小工具拍照建立提醒時才再讀。讀取名稱使用既有的精確位置權限，沒有另外申請附近 Wi-Fi 裝置權限。名稱不會上傳給開發者</td>
+          </tr>
+          <tr>
+            <td>步數（身體活動權限）</td>
+            <td>作為「正在移動」的佐證</td>
+            <td>只在手機上使用</td>
+          </tr>
+          <tr>
+            <td>已配對藍牙裝置（你選定的汽車藍牙）</td>
+            <td>連上汽車藍牙時作為移動佐證；本 App 不會掃描或連接新裝置</td>
+            <td>存在手機中</td>
+          </tr>
+          <tr>
+            <td>照片（透過系統相機拍攝）</td>
+            <td>拍照提醒</td>
+            <td>存在 App 的私人儲存空間，保存 7 天，開啟 App 時清理過期照片</td>
+          </tr>
+          <tr>
+            <td>提醒內容與歷史紀錄</td>
+            <td>顯示和再次使用提醒</td>
+            <td>存在手機中，歷史紀錄 30 天後自動清除</td>
+          </tr>
+          <tr>
+            <td>診斷紀錄（如果你啟用）</td>
+            <td>協助排查提醒問題，可能包含位置、Wi-Fi、感測紀錄</td>
+            <td>存在手機中。只有你按下「匯出」並自行選擇儲存位置時，才會產生 ZIP 檔；本 App 不會自動傳送給開發者</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ul>
+      <li>本 App 已停用 Android 雲端備份和裝置間轉移（不會把上述資料備份到 Google 雲端）。</li>
+      <li>解除安裝本 App 後，上述資料會跟著 App 一起從手機刪除（你另外匯出的診斷 ZIP 除外）。</li>
+    </ul>
+
+    <h2>3. 權限說明</h2>
+    <ul>
+      <li>位置（精確、背景「永遠允許」）：到達與離開提醒在需要判斷地點時使用，包含 App 關閉或未使用時。時間提醒不需要。暫停 GPS 或沿用 Wi-Fi 快照時，這項權限仍然保留。</li>
+      <li>通知：顯示提醒和背景監測狀態。</li>
+      <li>鬧鐘與提醒（精確鬧鐘）、全螢幕通知：在指定時間準時提醒，並在鎖定畫面顯示提醒卡片。</li>
+      <li>身體活動：讀取步數，作為移動佐證。</li>
+      <li>附近裝置（藍牙連線）：判斷是否連上你選定的汽車藍牙。</li>
+      <li>網路：下載地圖和搜尋地點。</li>
+    </ul>
+
+    <h2>4. 傳送到第三方服務的資料</h2>
+    <p>本 App 會直接從你的手機連到下列第三方服務（傳輸都使用 HTTPS 加密）。開發者不會經手、儲存或取得這些資料。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">服務</th>
+            <th scope="col">何時連線</th>
+            <th scope="col">傳送的資料</th>
+            <th scope="col">營運者與隱私權政策</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>OpenStreetMap 圖磚伺服器（tile.openstreetmap.org）</td>
+            <td>顯示地圖畫面時</td>
+            <td>你瀏覽的地圖區域（由圖磚編號推得，可能是你目前所在的區域）、IP 位址、App 識別資訊</td>
+            <td>OpenStreetMap Foundation：<a href="https://osmfoundation.org/wiki/Privacy_Policy">隱私權政策</a></td>
+          </tr>
+          <tr>
+            <td>Nominatim 地點搜尋（nominatim.openstreetmap.org）</td>
+            <td>只在你按下搜尋時</td>
+            <td>你輸入的搜尋文字、目前地圖中心附近的座標範圍、語言設定、IP 位址、App 識別資訊</td>
+            <td>OpenStreetMap Foundation：同上</td>
+          </tr>
+          <tr>
+            <td>Photon 地點搜尋（photon.komoot.io）</td>
+            <td>只在你按下搜尋時</td>
+            <td>你輸入的搜尋文字、目前地圖中心座標、IP 位址、App 識別資訊</td>
+            <td>komoot：<a href="https://www.komoot.com/privacy">隱私權政策</a>（這份是 komoot 服務的一般隱私權政策；找不到針對 Photon 公開 API 的專門條款）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ul>
+      <li>搜尋地點時，「目前地圖中心」可能是你目前所在的位置。</li>
+      <li>這些服務由第三方營運，他們如何處理資料（例如伺服器紀錄）依各自的隱私權政策。根據 OpenStreetMap Foundation 的政策，使用其服務時會產生使用紀錄，包括 IP 位址、裝置與應用程式資訊。</li>
+      <li>本 App 不會把位置或任何資料出售、用於廣告或提供給資料仲介。</li>
+    </ul>
+
+    <h2>5. 本 App 不做的事</h2>
+    <ul>
+      <li>不建立帳號，也不收集姓名、Email、電話。</li>
+      <li>沒有廣告 SDK、分析 SDK、當機回報 SDK。</li>
+      <li>不會把你的背景位置或 Wi-Fi 名稱傳出手機。背景位置只在手機上用來判斷到達與離開。暫停持續的 GPS 更新，不表示這項用途已經取消。</li>
+    </ul>
+
+    <h2>6. 兒童</h2>
+    <p>本 App 並非專為兒童設計。</p>
+
+    <h2>7. 你的選擇</h2>
+    <ul>
+      <li>你可以隨時在系統設定撤銷位置、通知、身體活動或藍牙權限。撤銷後相關提醒會受限，時間提醒仍可使用。</li>
+      <li>你可以依第 7.1 節，在 App 內停止所有背景位置使用與所有提醒。</li>
+      <li>你可以在 App 內刪除提醒、地點和住家。解除安裝本 App 會刪除所有本機資料。</li>
+      <li>開發者沒有保存你的任何資料，所以沒有可以向開發者申請刪除的資料。第三方服務的紀錄，請依各服務的隱私權政策處理。</li>
+    </ul>
+
+    <h2>7.1 停止所有 App 功能</h2>
+    <p>你可以在 App 底部的「設定」關閉「所有 App 功能」，並在確認框「停止所有功能？」按「停止所有功能」。</p>
+    <ul>
+      <li>這會停止背景位置的讀取與判斷、GPS 定位與背景偵測，並停止時間、到達、離開提醒。正在播放的鬧鈴與震動會停止，延後與自動再提醒的計時、系統鬧鐘和前景服務也會取消。桌面拍照小工具在停用期間不能使用。</li>
+      <li>提醒、照片、住家與其他設定仍留在手機上，不會被刪除。個別提醒，以及到達、離開、時間的分類開關，也維持你原來的選擇。</li>
+      <li>重新開啟 App 或重新開機都不會自動恢復。必須在「所有功能已停止」畫面按「恢復所有功能」。</li>
+      <li>停用期間錯過的提醒不會補發。恢復後只安排仍在未來的排程。</li>
+      <li>這不是 Android 的「強制停止」或解除安裝，也不會撤回系統已經允許的位置或其他權限。若要撤回權限，請到系統設定。</li>
+    </ul>
+
+    <h2>8. 政策變更</h2>
+    <p>如果本政策有變更，我們會更新這個頁面和生效日期。</p>
+
+    <h2>9. 聯絡我們</h2>
+    <p><a href="mailto:papalab26@gmail.com">papalab26@gmail.com</a></p>
+  </main>
+  <footer>
+    <p>地圖資料 © OpenStreetMap contributors（<a href="https://www.openstreetmap.org/copyright">openstreetmap.org/copyright</a>）。</p>
+  </footer>
+</body>
+</html>

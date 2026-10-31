@@ -1,0 +1,1 @@
+{"name":"papalab-3d-assets","private":true,"version":"1.0.0","description":"Papa-Lab 免費 Blender 建模與獨立預覽","dependencies":{"three":"0.180.0"},"scripts":{"vendor":"node scripts/vendor.mjs","serve":"python3 -m http.server 8765 --bind 0.0.0.0 --directory ."},"devDependencies":{"esbuild":"0.25.10","gltf-validator":"2.0.0-dev.3.10"}}

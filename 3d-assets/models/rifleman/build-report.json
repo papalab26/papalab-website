@@ -1,0 +1,47 @@
+{
+  "blender": "4.3.2",
+  "height_m": 1.95,
+  "triangles": 1776,
+  "vertices": 977,
+  "bones": 17,
+  "mesh_objects": 1,
+  "materials": [
+    "RiflemanVertexColors"
+  ],
+  "glb_bytes": 315908,
+  "blender_up": "+Z",
+  "blender_forward": "+Y",
+  "gltf_up": "+Y",
+  "gltf_forward": "-Z",
+  "origin": [
+    0,
+    0,
+    0
+  ],
+  "clips": {
+    "Idle": {
+      "duration_seconds": 2.0,
+      "loop": true
+    },
+    "Walk": {
+      "duration_seconds": 1.0,
+      "loop": true
+    },
+    "Aim": {
+      "duration_seconds": 0.75,
+      "loop": false
+    },
+    "Shoot": {
+      "duration_seconds": 0.5,
+      "loop": false
+    },
+    "Hit": {
+      "duration_seconds": 0.5833333333333334,
+      "loop": false
+    },
+    "Death": {
+      "duration_seconds": 1.5,
+      "loop": false
+    }
+  }
+}
